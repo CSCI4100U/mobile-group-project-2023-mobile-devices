@@ -5,6 +5,7 @@
   - However, we will later implement routes for adding a workout, taking you to the registration page,
   and potentially more involving the stats page
 */
+import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_body.dart';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:flutter/cupertino.dart';
@@ -61,7 +62,10 @@ class HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         // later somehow change the icon to a dumbell or something similar
         onPressed: () {
-          print("route to new page"); // this will route to a new page entirely
+             Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => WorkoutPage()),
+             );
         },
         backgroundColor: styles.getBackgroundColor(),
         focusColor: styles.getHighlightColor(),
