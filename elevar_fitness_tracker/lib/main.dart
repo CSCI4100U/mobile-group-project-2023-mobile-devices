@@ -5,13 +5,20 @@ import 'package:elevar_fitness_tracker/loading_screen/loading_screen.dart'; // I
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
   );
 
-  runApp(const MyApp());
+  runApp(
+    MaterialApp(
+      home: const MyApp(),
+      navigatorKey: navigatorKey,
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
