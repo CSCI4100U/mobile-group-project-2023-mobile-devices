@@ -26,6 +26,7 @@ class HomePageState extends State<HomePage> {
   int currentIndex = 0; // the currently selected page (default is home page)
   Map pages = {0:homeBody(), 1:statsBody(), 2:accountBody()}; // the mapping of our pages for the navbar
   //ExerciseDBModel database = ExerciseDBModel();
+  
 
   @override
   Widget build(BuildContext context) {
