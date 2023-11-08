@@ -70,4 +70,8 @@ class AppStyles {
   Color getHighlightColor() {
     return const Color(0xFF00CCFF);
   }
+
+  EdgeInsetsGeometry getDefaultInsets() {
+    return const EdgeInsets.all(10);
+  }
 }
