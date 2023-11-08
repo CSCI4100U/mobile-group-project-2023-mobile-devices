@@ -25,10 +25,10 @@ class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
 
   @override
-  _LoadingScreenState createState() => _LoadingScreenState();
+  LoadingScreenState createState() => LoadingScreenState();
 }
 //Delay functions transfer from loading screen to home page
-class _LoadingScreenState extends State<LoadingScreen> {
+class LoadingScreenState extends State<LoadingScreen> {
   @override
   void initState() {
     super.initState();
@@ -44,7 +44,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     }
   }
@@ -57,18 +57,19 @@ class _LoadingScreenState extends State<LoadingScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'ELEVATE',
+            const Text(
+              'ELEVAR',
               style: TextStyle(
                 fontFamily: 'Roboto',
                 fontSize: 45,
                 color: Colors.white,
               ),
             ),  
-            SizedBox(height: 150),
+
+            const SizedBox(height: 150),
+
             LoadingAnimationWidget.threeArchedCircle(
               color: Colors.white,
-  
               size: 50,
             ),
           ],
