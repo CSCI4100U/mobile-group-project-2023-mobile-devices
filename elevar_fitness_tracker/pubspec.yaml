@@ -25,6 +25,11 @@ dependencies:
 
   cloud_firestore: ^4.12.2
 
+  http: ^1.1.0
+
+  flutter_typeahead: ^4.8.0
+  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
