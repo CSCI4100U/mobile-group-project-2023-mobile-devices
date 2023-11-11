@@ -14,13 +14,11 @@ import 'page_bodies/stats_body.dart';
 import 'page_bodies/account_body.dart';
 //import 'package:elevar_fitness_tracker/local_storage/exercises_db_model.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
   @override
   HomePageState createState() => HomePageState();
 }
-
 
 class HomePageState extends State<HomePage> {
   AppStyles styles = AppStyles(); // initializing our styles object
@@ -38,7 +36,11 @@ class HomePageState extends State<HomePage> {
   }
 
   HomePageState() {
-    pages = {0:homeBody(), 1:statsBody(), 2:accountBody(refresh)}; // the mapping of our pages for the navbar
+    pages = {
+      0: homeBody(),
+      1: statsBody(),
+      2: accountBody(refresh)
+    }; // the mapping of our pages for the navbar
   }
 
   @override
@@ -48,20 +50,27 @@ class HomePageState extends State<HomePage> {
         currentIndex: currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home, color: styles.getObjectColor(),),
-            activeIcon: Icon(CupertinoIcons.home, color: styles.getHighlightColor(),),
+            icon: Icon(
+              CupertinoIcons.home,
+              color: styles.getObjectColor(),
+            ),
+            activeIcon: Icon(
+              CupertinoIcons.home,
+              color: styles.getHighlightColor(),
+            ),
             label: "Home",
           ),
-
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.graph_square, color: styles.getObjectColor()),
-            activeIcon: Icon(CupertinoIcons.graph_square, color: styles.getHighlightColor()),
-            label: "Stats"
-          ),
-
+              icon: Icon(CupertinoIcons.graph_square,
+                  color: styles.getObjectColor()),
+              activeIcon: Icon(CupertinoIcons.graph_square,
+                  color: styles.getHighlightColor()),
+              label: "Stats"),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_fill, color: styles.getObjectColor()),
-            activeIcon: Icon(CupertinoIcons.person_fill, color: styles.getHighlightColor()),
+            icon: Icon(CupertinoIcons.person_fill,
+                color: styles.getObjectColor()),
+            activeIcon: Icon(CupertinoIcons.person_fill,
+                color: styles.getHighlightColor()),
             label: "Account",
           )
         ],
@@ -76,21 +85,24 @@ class HomePageState extends State<HomePage> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        // later somehow change the icon to a dumbell or something similar
-        onPressed: () {
-             Navigator.push(
+          // later somehow change the icon to a dumbell or something similar
+          onPressed: () {
+            Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const WorkoutPage()),
-             );
-        },
-        backgroundColor: styles.getBackgroundColor(),
-        focusColor: styles.getHighlightColor(),
-        tooltip: "This will route to workout page",
-        child: Icon(Icons.add, size: 24, color: styles.getObjectColor(),)
-      ),
+            );
+          },
+          backgroundColor: styles.getBackgroundColor(),
+          focusColor: styles.getHighlightColor(),
+          tooltip: "This will route to workout page",
+          child: Icon(
+            Icons.add,
+            size: 24,
+            color: styles.getObjectColor(),
+          )),
 
-      body: pages[currentIndex], // this allows the body to change on setState() call
-      
+      body: pages[
+          currentIndex], // this allows the body to change on setState() call
     );
   }
 }
