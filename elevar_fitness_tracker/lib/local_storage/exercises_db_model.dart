@@ -29,16 +29,32 @@ import 'exercises_db_utils.dart';
 Future<void> insertDummyData() async {
   ExerciseDBModel dbModel = ExerciseDBModel();
 
-  List<Map<String, dynamic>> dummyExercises = [
-    {'name': 'Dumbbell Bicep Curl', 'heavySetReps': 10, 'weight': 25.0},
-    {'name': 'Barbell Bicep Curl', 'heavySetReps': 8, 'weight': 45.0},
-    {'name': 'Hammer Curl', 'heavySetReps': 12, 'weight': 20.0},
-  ];
+  // the dummy data gets inserted only if the db is empty
+  List<Map<String, dynamic>> allExercises = await dbModel.getAllExercises();
 
-  for (Map<String, dynamic> exercise in dummyExercises) {
-    await dbModel.insertExercise(exercise);
+  if (allExercises.isEmpty) {
+    List<Map<String, dynamic>> dummyExercises = [
+      {'name': 'Dumbbell Bicep Curl', 'heavySetReps': 10, 'weight': 25.0},
+      {'name': 'Barbell Bicep Curl', 'heavySetReps': 8, 'weight': 45.0},
+      {'name': 'Hammer Curl', 'heavySetReps': 10, 'weight': 30.0},
+      {'name': 'Bench Press', 'heavySetReps': 12, 'weight': 200.0},
+      {'name': 'Chest Press', 'heavySetReps': 22, 'weight': 200.0},
+      {'name': 'Lat Pulldown', 'heavySetReps': 14, 'weight': 35.0},
+      // add more exercises as needed
+    ];
+
+    for (Map<String, dynamic> exercise in dummyExercises) {
+      await dbModel.insertExercise(exercise);
+    }
   }
 }
+
+/*
+Future<void> deleteAllExercises() async {
+  final db = await DBUtils.init();
+  await db.delete('Exercises'); // delete all rows
+}
+*/
 
 class ExerciseDBModel {
   Future<int> insertExercise(Map<String, dynamic> exercise) async {

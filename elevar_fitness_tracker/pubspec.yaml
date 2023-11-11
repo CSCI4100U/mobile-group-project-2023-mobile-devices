@@ -13,6 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
 
+  fl_chart: ^0.40.0
+
   sqflite: ^2.3.0
 
   path: any
