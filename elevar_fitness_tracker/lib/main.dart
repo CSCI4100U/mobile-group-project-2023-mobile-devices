@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/home_page/homepage.dart';
 import 'package:elevar_fitness_tracker/loading_screen/loading_screen.dart'; // Import the loading screen
-import 'package:elevar_fitness_tracker/home_page/page_bodies/stats_body.dart';
 import 'package:elevar_fitness_tracker/local_storage/exercises_db_model.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 

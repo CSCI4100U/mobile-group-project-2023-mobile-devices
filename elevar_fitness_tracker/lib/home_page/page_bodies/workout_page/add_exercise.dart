@@ -13,7 +13,7 @@ class AddExercise extends StatefulWidget {
 
 class AddExerciseState extends State<AddExercise> {
 
-  AddExerciseState() {
+  AddExerciseState() { // initializing the selected value of the dropdown
     selectedValue = states[0];
   }
 
@@ -62,7 +62,8 @@ class AddExerciseState extends State<AddExercise> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercises', style: styles.getHeadingStyle()),
+        title: Text('Exercises', style: styles.getHeadingStyle(Colors.white)),
+        backgroundColor: styles.getObjectColor(),
       ),
       body: Column(
         children: [
@@ -116,7 +117,7 @@ class AddExerciseState extends State<AddExercise> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(styles.getObjectColor()),
+                  backgroundColor: MaterialStateProperty.all<Color>(styles.getHighlightColor()),
                   elevation: MaterialStateProperty.all<double>(4.0),
                 ),
                 child: Text('Add All', style: styles.getSubHeadingStyle(Colors.white),),

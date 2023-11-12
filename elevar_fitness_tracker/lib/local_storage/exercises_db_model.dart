@@ -49,12 +49,11 @@ Future<void> insertDummyData() async {
   }
 }
 
-/*
 Future<void> deleteAllExercises() async {
   final db = await DBUtils.init();
   await db.delete('Exercises'); // delete all rows
 }
-*/
+
 
 class ExerciseDBModel {
   Future<int> insertExercise(Map<String, dynamic> exercise) async {

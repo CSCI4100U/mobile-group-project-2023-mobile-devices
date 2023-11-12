@@ -118,79 +118,79 @@ Widget accountBody(Function() notifyParent) {
   final lastNameController = TextEditingController();
 
   return Scaffold(
-      appBar: AppBar(
-          title: Text("Account", style: styles.getHeadingStyle()),
-          backgroundColor: styles.getHighlightColor(),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(CupertinoIcons.square_arrow_left),
-              onPressed: () {},
-            )
-          ]),
-      body: Container(
-          padding: styles.getDefaultInsets(),
-          child: Column(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: styles.getBackgroundColor(),
-                    borderRadius: const BorderRadius.all(Radius.circular(10))),
-                child: Column(children: [
-                  Row(children: [
-                    Padding(
-                        padding: styles.getDefaultInsets(),
-                        child: Text("$username's Info",
-                            style: styles.getSubHeadingStyle()))
-                  ]),
-                  FutureBuilder(
-                      future: users.doc(username).get(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<DocumentSnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Center(
-                              child: Text("Something went wrong!",
-                                  style: styles.getSubHeadingStyle()));
-                        }
-
-                        if (snapshot.hasData && !snapshot.data!.exists) {
-                          return Center(
-                              child: Text(
-                                  "Could not fetch data for '$username'!",
-                                  style: styles.getSubHeadingStyle()));
-                        }
-
-                        if (snapshot.connectionState == ConnectionState.done) {
-                          Map<String, dynamic> data =
-                              snapshot.data!.data() as Map<String, dynamic>;
-
-                          return ListView(
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true,
-                              children: [
-                                generateUserEntry(
-                                  "Name",
-                                  CupertinoIcons.person_crop_circle_fill,
-                                  "${data['first_name']} ${data['last_name']}",
-                                  () {
-                                    editNameDialog(username, data, firstNameController, lastNameController, notifyParent);
-                                  }
-                                ),
-                                generateUserEntry(
-                                  "Birthdate",
-                                  CupertinoIcons.calendar,
-                                  formatTimestamp((data['birthdate'] as Timestamp).toDate()),
-                                  () {
-                                    editBirthdateDialog(username, data, notifyParent);
-                                  })
-                              ]);
-                        }
-
-                        return Center(
-                            child: Text("Loading...",
-                                style: styles.getSubHeadingStyle()));
-                      })
+    //backgroundColor: styles.getBackgroundColor(),
+    appBar: AppBar(
+        title: Text("Account", style: styles.getHeadingStyle(Colors.white)),
+        backgroundColor: styles.getObjectColor(),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(CupertinoIcons.square_arrow_left),
+            onPressed: () {},
+          )
+        ]),
+    body: Container(
+        padding: styles.getDefaultInsets(),
+        child: Column(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10))),
+              child: Column(children: [
+                Row(children: [
+                  Padding(
+                      padding: styles.getDefaultInsets(),
+                      child: Text("$username's Info",
+                          style: styles.getSubHeadingStyle()))
                 ]),
-              )
-            ],
-          )));
+                FutureBuilder(
+                    future: users.doc(username).get(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                            child: Text("Something went wrong!",
+                                style: styles.getSubHeadingStyle()));
+                      }
+
+                      if (snapshot.hasData && !snapshot.data!.exists) {
+                        return Center(
+                            child: Text(
+                                "Could not fetch data for '$username'!",
+                                style: styles.getSubHeadingStyle()));
+                      }
+
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        Map<String, dynamic> data =
+                            snapshot.data!.data() as Map<String, dynamic>;
+
+                        return ListView(
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            children: [
+                              generateUserEntry(
+                                "Name",
+                                CupertinoIcons.person_crop_circle_fill,
+                                "${data['first_name']} ${data['last_name']}",
+                                () {
+                                  editNameDialog(username, data, firstNameController, lastNameController, notifyParent);
+                                }
+                              ),
+                              generateUserEntry(
+                                "Birthdate",
+                                CupertinoIcons.calendar,
+                                formatTimestamp((data['birthdate'] as Timestamp).toDate()),
+                                () {
+                                  editBirthdateDialog(username, data, notifyParent);
+                                })
+                            ]);
+                      }
+
+                      return Center(
+                          child: Text("Loading...",
+                              style: styles.getSubHeadingStyle()));
+                    })
+              ]),
+            )
+          ],
+        )));
 }

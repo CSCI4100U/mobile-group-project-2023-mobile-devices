@@ -24,7 +24,7 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   AppStyles styles = AppStyles(); // initializing our styles object
-  int currentIndex = 0; // the currently selected page (default is home page)
+  int currentIndex = 1; // the currently selected page (default is home page)
   late Map pages;
   //ExerciseDBModel database = ExerciseDBModel();
 
@@ -38,7 +38,7 @@ class HomePageState extends State<HomePage> {
   }
 
   HomePageState() {
-    pages = {0:homeBody(), 1:statsBody(), 2:accountBody(refresh)}; // the mapping of our pages for the navbar
+    pages = {0:statsBody(), 1:homeBody(), 2:accountBody(refresh)}; // the mapping of our pages for the navbar
   }
 
   @override
@@ -48,15 +48,15 @@ class HomePageState extends State<HomePage> {
         currentIndex: currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home, color: styles.getObjectColor(),),
-            activeIcon: Icon(CupertinoIcons.home, color: styles.getHighlightColor(),),
-            label: "Home",
-          ),
-
-          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.graph_square, color: styles.getObjectColor()),
             activeIcon: Icon(CupertinoIcons.graph_square, color: styles.getHighlightColor()),
             label: "Stats"
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.home, color: styles.getObjectColor(),),
+            activeIcon: Icon(CupertinoIcons.home, color: styles.getHighlightColor(),),
+            label: "Home",
           ),
 
           BottomNavigationBarItem(
@@ -75,7 +75,7 @@ class HomePageState extends State<HomePage> {
         },
       ),
 
-      floatingActionButton: currentIndex == 0? FloatingActionButton(
+      floatingActionButton: currentIndex == 1? FloatingActionButton(
         // later somehow change the icon to a dumbell or something similar
         onPressed: () {
           Navigator.push(
@@ -85,7 +85,7 @@ class HomePageState extends State<HomePage> {
         },
         backgroundColor: styles.getBackgroundColor(),
         focusColor: styles.getHighlightColor(),
-        tooltip: "Start a new workout",
+        tooltip: "Create a new workout",
         child: Icon(Icons.add, size: 24, color: styles.getObjectColor()),
         /*
         const ImageIcon(

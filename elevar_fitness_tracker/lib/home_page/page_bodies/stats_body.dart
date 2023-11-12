@@ -11,8 +11,8 @@ class statsBody extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Your Statistics",
-            style: styles.getSubHeadingStyle(styles.getObjectColor())),
-        backgroundColor: styles.getBackgroundColor(),
+            style: styles.getHeadingStyle(Colors.white)),
+        backgroundColor: styles.getObjectColor(),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: dbModel.getAllExercises(), // get all exercises
@@ -37,7 +37,7 @@ class statsBody extends StatelessWidget {
               },
             );
           } else {
-            return Center(child: Text('No exercises found'));
+            return const Center(child: Text('No exercise data found'));
           }
         },
       ),

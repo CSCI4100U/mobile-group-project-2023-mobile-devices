@@ -31,8 +31,6 @@ class WorkoutPageState extends State<WorkoutPage> {
               selectedExercises = await Navigator.push(
                 context, 
                 MaterialPageRoute(builder: (context) => const AddExercise()));
-                
-              selectedExercises.forEach((element) {print(element.name);});
             }, 
             child: Text(
               'Add An Exercise',
