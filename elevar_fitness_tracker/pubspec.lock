@@ -90,6 +90,17 @@ packages:
     source: hosted
     version: "1.0.6"
   dbus:
+<<<<<<< Updated upstream
+=======
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "6f07cba3f7b3448d42d015bfd3d53fe12e5b36da2423f23838efc1d5fb31a263"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.8"
+  equatable:
+>>>>>>> Stashed changes
     dependency: transitive
     description:
       name: dbus
@@ -151,7 +162,11 @@ packages:
     source: hosted
     version: "2.0.3"
   flutter_local_notifications:
+<<<<<<< Updated upstream
     dependency: "direct dev"
+=======
+    dependency: "direct main"
+>>>>>>> Stashed changes
     description:
       name: flutter_local_notifications
       sha256: "6d11ea777496061e583623aaf31923f93a9409ef8fcaeeefdd6cd78bf4fe5bb3"
@@ -343,6 +358,17 @@ packages:
     version: "0.6.0"
   timezone:
     dependency: "direct dev"
+<<<<<<< Updated upstream
+=======
+    description:
+      name: timezone
+      sha256: "1cfd8ddc2d1cfd836bc93e67b9be88c3adaeca6f40a00ca999104c30693cdca0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.2"
+  typed_data:
+    dependency: transitive
+>>>>>>> Stashed changes
     description:
       name: timezone
       sha256: "1cfd8ddc2d1cfd836bc93e67b9be88c3adaeca6f40a00ca999104c30693cdca0"
