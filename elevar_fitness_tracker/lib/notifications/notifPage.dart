@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-=======
->>>>>>> Stashed changes
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 
