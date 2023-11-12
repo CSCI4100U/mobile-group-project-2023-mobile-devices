@@ -25,21 +25,8 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   AppStyles styles = AppStyles(); // initializing our styles object
   int currentIndex = 1; // the currently selected page (default is home page)
-  late Map pages;
+  Map pages = {0:statsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
   //ExerciseDBModel database = ExerciseDBModel();
-
-  void refresh() {
-    refreshAccountBody();
-    setState(() {});
-  }
-
-  void refreshAccountBody() {
-    pages[2] = accountBody(refresh);
-  }
-
-  HomePageState() {
-    pages = {0:statsBody(), 1:HomeBody(), 2:accountBody(refresh)}; // the mapping of our pages for the navbar
-  }
 
   @override
   Widget build(BuildContext context) {
