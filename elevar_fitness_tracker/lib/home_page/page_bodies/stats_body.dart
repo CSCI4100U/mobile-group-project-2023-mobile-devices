@@ -30,7 +30,7 @@ class statsBody extends StatelessWidget {
                 var exercise = maxStats[index];
                 return ListTile(
                   title:
-                      Text(exercise['name'], style: styles.getMainTextStyle()),
+                      Text(exercise['name'], style: styles.getSubHeadingStyle()),
                   subtitle: Text(
                     'Max Reps: ${exercise['maxReps']} | Max Weight: ${exercise['maxWeight']} lbs',
                     style: styles.getMainTextStyle(),

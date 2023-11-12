@@ -38,7 +38,7 @@ class HomePageState extends State<HomePage> {
   }
 
   HomePageState() {
-    pages = {0:statsBody(), 1:homeBody(), 2:accountBody(refresh)}; // the mapping of our pages for the navbar
+    pages = {0:statsBody(), 1:HomeBody(), 2:accountBody(refresh)}; // the mapping of our pages for the navbar
   }
 
   @override

@@ -125,12 +125,13 @@ class AddExerciseState extends State<AddExercise> {
                 child: ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
-                        styles.getObjectColor()),
+                        styles.getHighlightColor()),
                     elevation: MaterialStateProperty.all<double>(4.0),
+                    side: MaterialStateProperty.all<BorderSide>(const BorderSide(color:Colors.black, width: 2.0))
                   ),
                   child: Text(
                     'Add All',
-                    style: styles.getSubHeadingStyle(Colors.white),
+                    style: styles.getSubHeadingStyle(Colors.black),
                   ),
                   onPressed: () {
                     Navigator.pop(context, selectedExercises);

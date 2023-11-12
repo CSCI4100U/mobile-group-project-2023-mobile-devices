@@ -40,9 +40,9 @@ class WorkoutPageState extends State<WorkoutPage> {
               width: double.infinity,
               child: TextButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(styles.getObjectColor()),
+                  backgroundColor: MaterialStateProperty.all<Color>(styles.getHighlightColor()),
                   elevation: MaterialStateProperty.all<double>(4.0),
-                  side: MaterialStateProperty.all<BorderSide>(const BorderSide(color:Colors.black,))
+                  side: MaterialStateProperty.all<BorderSide>(const BorderSide(color:Colors.black, width: 2.0))
                 ),
                 onPressed: () async {
                   List<ExerciseItem> newExercises = await Navigator.push(
@@ -58,7 +58,7 @@ class WorkoutPageState extends State<WorkoutPage> {
                 }, 
                 child: Text(
                   'Add New Exercise',
-                  style: styles.getSubHeadingStyle(Colors.white),
+                  style: styles.getSubHeadingStyle(Colors.black),
                 )
               ),
             ),

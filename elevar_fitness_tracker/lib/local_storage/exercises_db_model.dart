@@ -98,7 +98,7 @@ class ExerciseDBModel {
       [name],
     );
 
-    if (result.isNotEmpty && result.first != null) {
+    if (result.isNotEmpty) {
       return result.first;
     } else {
       return {
