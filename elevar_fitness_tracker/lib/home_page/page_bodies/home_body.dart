@@ -5,10 +5,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 import 'package:pedometer/pedometer.dart';
 =======
 import 'package:path/path.dart';
 import 'package:pedometer/pedometer.dart';
+import 'package:elevar_fitness_tracker/notifications/notifications.dart';
+import 'package:elevar_fitness_tracker/notifications/notifPage.dart';
+>>>>>>> Stashed changes
+=======
+import 'package:pedometer/pedometer.dart';
+import 'package:path/path.dart';
 import 'package:elevar_fitness_tracker/notifications/notifications.dart';
 import 'package:elevar_fitness_tracker/notifications/notifPage.dart';
 >>>>>>> Stashed changes
@@ -23,18 +30,32 @@ class _HomeBodyState extends State<homeBody> {
   AppStyles styles = AppStyles();
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+//get out-of app notifications
+>>>>>>> Stashed changes
   final notifications = Notifications();
   String notifTitle = "Elevar";
   String notifBody =
       "Welcome to Elevar! You have agreed to receive notifications for your workouts.";
   String? payload;
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+//Pedometer
 >>>>>>> Stashed changes
   late Stream<StepCount> _stepCountStream;
   String _stepCount = "0";
 
   IconData currentNotifIcon = CupertinoIcons.bell;
+<<<<<<< Updated upstream
+=======
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+
+  bool hasClicked = false;
+>>>>>>> Stashed changes
 
   @override
   void initState() {
@@ -60,9 +81,12 @@ class _HomeBodyState extends State<homeBody> {
   }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   @override
   Widget build(BuildContext context) {
 =======
+=======
+>>>>>>> Stashed changes
   void notificationIconChange() {
     setState(() {
       currentNotifIcon = (currentNotifIcon == CupertinoIcons.bell)
@@ -76,7 +100,37 @@ class _HomeBodyState extends State<homeBody> {
         notifTitle, notifBody, "This is the payload");
   }
 
+<<<<<<< Updated upstream
   void handleNotifButton() {
+=======
+  void showNotifAlert() {
+    showDialog(
+      context: scaffoldKey.currentContext!,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('You have opted to receive notifications'),
+          content: Text(
+              'Hold the notification bell to see your list of workout notifications'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void handleNotifButton() {
+    if (!hasClicked) {
+      showNotifAlert();
+
+      hasClicked = true;
+    }
+>>>>>>> Stashed changes
     if (currentNotifIcon == CupertinoIcons.bell_slash) {
       notificationIconChange();
       sendNotification();
@@ -89,12 +143,18 @@ class _HomeBodyState extends State<homeBody> {
   Widget build(BuildContext context) {
     notifications.init();
 
+<<<<<<< Updated upstream
 >>>>>>> Stashed changes
     return Scaffold(
+=======
+    return Scaffold(
+      key: scaffoldKey,
+>>>>>>> Stashed changes
       appBar: AppBar(
         title: Text("Home", style: styles.getHeadingStyle()),
         backgroundColor: styles.getHighlightColor(),
         actions: [
+<<<<<<< Updated upstream
           //in-app/local notifs?
 <<<<<<< Updated upstream
           IconButton(
@@ -103,6 +163,8 @@ class _HomeBodyState extends State<homeBody> {
               notificationIconChange();
             }),
 =======
+=======
+>>>>>>> Stashed changes
           ElevatedButton(
             child: Icon(currentNotifIcon),
             onPressed: handleNotifButton,
@@ -113,6 +175,9 @@ class _HomeBodyState extends State<homeBody> {
                     builder: ((context) => NotifPage()),
                   ));
             },
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
           )
         ],
@@ -122,8 +187,12 @@ class _HomeBodyState extends State<homeBody> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           // First Container with Stack
           Container(
+=======
+          SizedBox(
+>>>>>>> Stashed changes
 =======
           SizedBox(
 >>>>>>> Stashed changes
@@ -137,7 +206,11 @@ class _HomeBodyState extends State<homeBody> {
                   height: 150.0,
                   decoration: BoxDecoration(
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     color: Color(0xFF00CCFF),
+=======
+                    color: const Color(0xFF00CCFF),
+>>>>>>> Stashed changes
 =======
                     color: const Color(0xFF00CCFF),
 >>>>>>> Stashed changes
@@ -153,7 +226,11 @@ class _HomeBodyState extends State<homeBody> {
             ),
           ),
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
           SizedBox(height: 20.0), // Add some space between containers
+=======
+          const SizedBox(height: 20.0), // Add some space between containers
+>>>>>>> Stashed changes
 =======
           const SizedBox(height: 20.0), // Add some space between containers
 >>>>>>> Stashed changes
@@ -162,7 +239,11 @@ class _HomeBodyState extends State<homeBody> {
             width: 300.0,
             height: 150.0,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             margin: EdgeInsets.all(20.0),
+=======
+            margin: styles.getDefaultInsets(),
+>>>>>>> Stashed changes
 =======
             margin: styles.getDefaultInsets(),
 >>>>>>> Stashed changes
@@ -184,6 +265,7 @@ class _HomeBodyState extends State<homeBody> {
     );
   }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
   void notificationIconChange() {
     setState(() {
@@ -192,6 +274,8 @@ class _HomeBodyState extends State<homeBody> {
           : CupertinoIcons.bell;
     });
   }
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 }

@@ -31,6 +31,8 @@ dependencies:
   http: ^1.1.0
 
   flutter_typeahead: ^4.8.0
+  pedometer: ^4.0.1
+  flutter_local_notifications:
   
   pedometer: ^4.0.1
   
