@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
-import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/exercise_item.dart';
+import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/Exercise_selection_page/exercise_data.dart';
 import 'package:elevar_fitness_tracker/http/http_model.dart';
 
 

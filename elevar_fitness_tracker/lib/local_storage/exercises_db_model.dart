@@ -25,7 +25,8 @@ import 'exercises_db_utils.dart';
     {'name':'Tricep Pushdown'}
   ];
 */
-// test values
+
+// loading and deleting some dummy variables 
 Future<void> insertDummyData() async {
   ExerciseDBModel dbModel = ExerciseDBModel();
 

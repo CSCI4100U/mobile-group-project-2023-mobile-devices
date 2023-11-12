@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/exercise_item.dart';
+import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/Exercise_selection_page/exercise_data.dart';
 
 
 class HttpModel {
