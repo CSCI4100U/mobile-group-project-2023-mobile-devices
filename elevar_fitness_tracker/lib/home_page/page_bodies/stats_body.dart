@@ -15,29 +15,31 @@ class statsBody extends StatelessWidget {
         backgroundColor: styles.getObjectColor(),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: dbModel.getAllExercises(), // get all exercises
+        // get the max stats for each exercise
+        future: dbModel.getMaxStatsForAllExercises(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            List<Map<String, dynamic>> exercises = snapshot.data!;
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            List<Map<String, dynamic>> maxStats = snapshot.data!;
             return ListView.builder(
-              itemCount: exercises.length,
+              itemCount: maxStats.length,
               itemBuilder: (context, index) {
-                var exercise = exercises[index];
+                var exercise = maxStats[index];
                 return ListTile(
                   title:
                       Text(exercise['name'], style: styles.getMainTextStyle()),
                   subtitle: Text(
-                      'Reps: ${exercise['heavySetReps']} | Weight: ${exercise['weight']} lbs',
-                      style: styles.getMainTextStyle()),
+                    'Max Reps: ${exercise['maxReps']} | Max Weight: ${exercise['maxWeight']} lbs',
+                    style: styles.getMainTextStyle(),
+                  ),
                 );
               },
             );
           } else {
-            return const Center(child: Text('No exercise data found'));
+            return const Center(child: Text('No exercise data available'));
           }
         },
       ),

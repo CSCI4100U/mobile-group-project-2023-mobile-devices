@@ -41,6 +41,14 @@ Future<void> insertDummyData() async {
       {'name': 'Bench Press', 'heavySetReps': 12, 'weight': 200.0},
       {'name': 'Chest Press', 'heavySetReps': 22, 'weight': 200.0},
       {'name': 'Lat Pulldown', 'heavySetReps': 14, 'weight': 35.0},
+
+      {'name': 'Dumbbell Bicep Curl', 'heavySetReps': 10, 'weight': 100.0},
+      {'name': 'Barbell Bicep Curl', 'heavySetReps': 8, 'weight': 100.0},
+      {'name': 'Hammer Curl', 'heavySetReps': 10, 'weight': 300.0},
+      {'name': 'Bench Press', 'heavySetReps': 12, 'weight': 300.0},
+      {'name': 'Chest Press', 'heavySetReps': 22, 'weight': 300.0},
+      {'name': 'Lat Pulldown', 'heavySetReps': 14, 'weight': 335.0},
+      {'name': 'Tricep Pushdown', 'heavySetReps': 14, 'weight': 335.0},
       // add more exercises as needed
     ];
 
@@ -54,7 +62,6 @@ Future<void> deleteAllExercises() async {
   final db = await DBUtils.init();
   await db.delete('Exercises'); // delete all rows
 }
-
 
 class ExerciseDBModel {
   Future<int> insertExercise(Map<String, dynamic> exercise) async {
@@ -81,5 +88,34 @@ class ExerciseDBModel {
 
     return await db
         .update('Exercises', update, where: 'name = ?', whereArgs: [name]);
+  }
+
+  Future<Map<String, dynamic>> getMaxStatsForExercise(String name) async {
+    final db = await DBUtils.init();
+    // group the results by the exercise name and return the max values for each group
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT name, MAX(heavySetReps) as maxReps, MAX(weight) as maxWeight FROM Exercises WHERE name = ? GROUP BY name',
+      [name],
+    );
+
+    if (result.isNotEmpty && result.first != null) {
+      return result.first;
+    } else {
+      return {
+        'name': name,
+        'maxWeight': 0,
+        'maxReps': 0
+      }; // Default values if no data is found
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getMaxStatsForAllExercises() async {
+    final db = await DBUtils.init();
+    // This query groups the results by the exercise name and returns the max values for each group
+    List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT name, MAX(heavySetReps) as maxReps, MAX(weight) as maxWeight FROM Exercises GROUP BY name',
+    );
+
+    return result;
   }
 }
