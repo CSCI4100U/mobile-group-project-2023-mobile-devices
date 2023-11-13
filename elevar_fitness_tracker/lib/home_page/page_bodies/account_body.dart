@@ -105,8 +105,140 @@ class _AccountBodyState extends State<AccountBody> {
     } 
   }
 
-  void editEmailDialog(BuildContext context, String email, Map<String, dynamic> data) async {
+  void editEmailDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController emailController, TextEditingController confirmController) async {
+    emailController.text = data['email'];
+    final _editEmailFormKey = GlobalKey<FormState>();
 
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: Text('Edit Email', style: styles.getSubHeadingStyle()),
+          content: Form(
+            key: _editEmailFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(label: Text("New e-mail")),
+                  controller: emailController
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(label: Text("Confirm new e-mail")),
+                  controller: confirmController,
+                  validator: (String? value) {
+                    return (emailController.text != confirmController.text) ? 'E-mails must match' : null;
+                  },
+                  autovalidateMode: AutovalidateMode.always,
+                )
+              ],
+            )
+          ),
+          actions: <Widget>[
+            MaterialButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.pop(ctx);
+              }
+            ),
+            MaterialButton(
+              color: styles.getHighlightColor(),
+              child: const Text("Confirm"),
+              onPressed: () {
+                if (_editEmailFormKey.currentState!.validate()) {
+                  FirebaseFirestore.instance.collection('users').doc(username).update({
+                    'email': emailController.text
+                  });
+
+                  setState(() { });
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Updated e-mail to \"${emailController.text}\"")
+                    )
+                  );
+                }
+              }
+            )
+          ]
+        );
+      }
+    );
+  }
+
+  void editPasswordDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController currentPassword, TextEditingController newPassword, TextEditingController confirmNewPassword) async {
+    final _editPasswordFormKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext ctx) {
+        return AlertDialog(
+          title: Text('Edit Password', style: styles.getSubHeadingStyle()),
+          content: Form(
+            key: _editPasswordFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(label: Text("Current password")),
+                  controller: currentPassword,
+                  validator: (String? value) {
+                    return (currentPassword.text != data['password']) ? "Incorrect password" : null;
+                  }
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(label: Text("New password")),
+                  controller: newPassword,
+                  validator: (String? value) {
+                    if (newPassword.text.isEmpty) {
+                      return "Password cannot be empty";
+                    } else if (newPassword.text == currentPassword.text) {
+                      return "New password cannot match old password";
+                    }
+
+                    return null;
+                  }
+                ),
+                TextFormField(
+                  decoration: const InputDecoration(label: Text("Confirm new password")),
+                  controller: confirmNewPassword,
+                  validator: (String? value) {
+                    return (newPassword.text != confirmNewPassword.text) ? "Passwords must match" : null;
+                  }
+                )
+              ],
+            )
+          ),
+          actions: <Widget>[
+            MaterialButton(
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.pop(ctx);
+              }
+            ),
+            MaterialButton(
+              color: styles.getHighlightColor(),
+              child: const Text("Confirm"),
+              onPressed: () {
+                if (_editPasswordFormKey.currentState!.validate()) {
+                  FirebaseFirestore.instance.collection('users').doc(username).update({
+                    'password': newPassword.text
+                  });
+
+                  setState(() { });
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Updated password")
+                    )
+                  );
+                }
+              }
+            )
+          ]
+        );
+      }
+    );
   }
 
   ListTile generateUserEntry(String entryName, IconData? icon, String text, Function() onPress, [bool? hideText]) {
@@ -133,6 +265,11 @@ class _AccountBodyState extends State<AccountBody> {
 
     final firstNameController = TextEditingController();
     final lastNameController = TextEditingController();
+    final emailController = TextEditingController();
+    final emailConfirmController = TextEditingController();
+    final currentPasswordController = TextEditingController();
+    final newPasswordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
 
     return Scaffold(
       backgroundColor: styles.getBackgroundColor(),
@@ -245,7 +382,7 @@ class _AccountBodyState extends State<AccountBody> {
                         CupertinoIcons.mail_solid,
                         "${data['email']}",
                         () {
-                          
+                          editEmailDialog(context, username, data, emailController, emailConfirmController);
                         }
                       ),
                       generateUserEntry(
@@ -253,7 +390,7 @@ class _AccountBodyState extends State<AccountBody> {
                         CupertinoIcons.lock_fill,
                         "${data['password']}",
                         () {
-                          
+                          editPasswordDialog(context, username, data, currentPasswordController, newPasswordController, confirmPasswordController);
                         },
                         true
                       )
