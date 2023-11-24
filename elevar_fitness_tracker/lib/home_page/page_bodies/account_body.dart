@@ -1,27 +1,58 @@
 /*
   This file returns the encapsulating body widget for the Account page
 */
-import 'package:elevar_fitness_tracker/main.dart';
+import 'package:elevar_fitness_tracker/components/account_page_entry.dart';
+import 'package:elevar_fitness_tracker/login_signup_page/login_signup_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
-
-import 'package:firebase_core/firebase_core.dart';
-import 'package:elevar_fitness_tracker/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class AccountBody extends StatefulWidget {
-  AccountBody({super.key});
+  const AccountBody({super.key});
 
   @override
   State<AccountBody> createState() => _AccountBodyState();
 }
 
 class _AccountBodyState extends State<AccountBody> {
-  AppStyles styles = AppStyles();
+  SharedPreferences? prefs;
+  String username = "";
+  AppStyles styles = AppStyles(); // TODO: replace with new app styles
+
+  @override
+  void initState() {
+    super.initState();
+
+    SharedPreferences.getInstance().then((sharedPrefs) {
+      setState(() {
+        prefs = sharedPrefs;
+        username = prefs?.getString('username') ?? "";
+      });
+    });
+  }
   
-  String formatTimestamp(DateTime date) {
-    return "${date.year.toString()}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}";
+  String formatTimestamp(DateTime date, {bool asText = false}) {
+    const Map<int, String> months = {
+      1: "January",
+      2: "February",
+      3: "March",
+      4: "April",
+      5: "May",
+      6: "June",
+      7: "July",
+      8: "August",
+      9: "September",
+      10: "October",
+      11: "November",
+      12: "December"
+    };
+
+    return asText ?
+      "${months[date.month]} ${date.day}, ${date.year}" :
+      "${date.year.toString()}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}";
   }
 
   void editNameDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController firstNameController, TextEditingController lastNameController) {
@@ -97,6 +128,7 @@ class _AccountBodyState extends State<AccountBody> {
       });
 
       setState(() { });
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Updated birthdate to \"${formatTimestamp(Timestamp.fromDate(picked).toDate())}\"")
@@ -107,7 +139,7 @@ class _AccountBodyState extends State<AccountBody> {
 
   void editEmailDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController emailController, TextEditingController confirmController) async {
     emailController.text = data['email'];
-    final _editEmailFormKey = GlobalKey<FormState>();
+    final editEmailFormKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -115,7 +147,7 @@ class _AccountBodyState extends State<AccountBody> {
         return AlertDialog(
           title: Text('Edit Email', style: styles.getSubHeadingStyle()),
           content: Form(
-            key: _editEmailFormKey,
+            key: editEmailFormKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -145,7 +177,7 @@ class _AccountBodyState extends State<AccountBody> {
               color: styles.getHighlightColor(),
               child: const Text("Confirm"),
               onPressed: () {
-                if (_editEmailFormKey.currentState!.validate()) {
+                if (editEmailFormKey.currentState!.validate()) {
                   FirebaseFirestore.instance.collection('users').doc(username).update({
                     'email': emailController.text
                   });
@@ -167,7 +199,7 @@ class _AccountBodyState extends State<AccountBody> {
   }
 
   void editPasswordDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController currentPassword, TextEditingController newPassword, TextEditingController confirmNewPassword) async {
-    final _editPasswordFormKey = GlobalKey<FormState>();
+    final editPasswordFormKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
@@ -175,7 +207,7 @@ class _AccountBodyState extends State<AccountBody> {
         return AlertDialog(
           title: Text('Edit Password', style: styles.getSubHeadingStyle()),
           content: Form(
-            key: _editPasswordFormKey,
+            key: editPasswordFormKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -220,7 +252,7 @@ class _AccountBodyState extends State<AccountBody> {
               color: styles.getHighlightColor(),
               child: const Text("Confirm"),
               onPressed: () {
-                if (_editPasswordFormKey.currentState!.validate()) {
+                if (editPasswordFormKey.currentState!.validate()) {
                   FirebaseFirestore.instance.collection('users').doc(username).update({
                     'password': newPassword.text
                   });
@@ -241,26 +273,13 @@ class _AccountBodyState extends State<AccountBody> {
     );
   }
 
-  ListTile generateUserEntry(String entryName, IconData? icon, String text, Function() onPress, [bool? hideText]) {
-    return ListTile(
-      leading: Tooltip(
-        message: entryName,
-        child: Icon(icon)
-      ),
-      title: Text((hideText == null) ? text : '*' * text.length, style: styles.getSubHeadingStyle()),
-      trailing: IconButton(
-        icon: const Icon(CupertinoIcons.pencil),
-        onPressed: () {
-          onPress();
-        },
-      ),
-      contentPadding: const EdgeInsets.only(left: 20),
-    );
+  // For refreshing page when user toggles dark mode
+  void refresh() {
+    setState(() {});
   }
 
   @override
-  Widget build(BuildContext context) {
-    String username = "testuser1";
+  Widget build(BuildContext buildContext) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
 
     final firstNameController = TextEditingController();
@@ -271,141 +290,354 @@ class _AccountBodyState extends State<AccountBody> {
     final newPasswordController = TextEditingController();
     final confirmPasswordController = TextEditingController();
 
+    bool isDarkMode = prefs?.getBool('darkmode') ?? false;
+
     return Scaffold(
-      backgroundColor: styles.getBackgroundColor(),
+      backgroundColor: AppStyles.backgroundColor(isDarkMode),
       appBar: AppBar(
-          title: Text("Account", style: styles.getHeadingStyle(Colors.white)),
-          backgroundColor: styles.getObjectColor(),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(CupertinoIcons.square_arrow_left),
-              onPressed: () {},
-            )
-          ]),
-      body: FutureBuilder(
-        future: users.doc(username).get(),
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text("Something went wrong!",
-              style: styles.getSubHeadingStyle())
-            );
-          }
-
-          if (snapshot.hasData && !snapshot.data!.exists) {
-            return Center(
-              child: Text(
-                "Could not fetch data for '$username'!",
-                style: styles.getSubHeadingStyle()
+        title: Row(
+          children: [
+            Icon(
+              CupertinoIcons.person_solid,
+              color: AppStyles.textColor(isDarkMode)
+            ),
+            const SizedBox(width: 10),
+            Text(
+              "Account",
+              style: TextStyle(
+                fontFamily: 'Geologica',
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: AppStyles.textColor(isDarkMode),
               )
-            );
-          }
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.logout,
+              color: AppStyles.textColor(isDarkMode),
+            ),
+            onPressed: () {
+              prefs?.setString('username', '');
+              prefs?.setString('password', '');
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginSignupPage()),
+              );
+            },
+          )
+        ],
+        backgroundColor: AppStyles.primaryColor(isDarkMode).withOpacity(isDarkMode ? 0.5 : 1.0)
+      ),
+      body: Stack(
+        children: [
+          Container(
+            color: isDarkMode ? Colors.transparent : AppStyles.primaryColor(isDarkMode).withOpacity(0.2)
+          ),
+          FutureBuilder(
+            future: SharedPreferences.getInstance(),
+            builder: (BuildContext context0, AsyncSnapshot<SharedPreferences> snapshot0) {
+              if (snapshot0.connectionState == ConnectionState.done) {
+                return FutureBuilder(
+                  future: users.doc(username).get(),
+                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text("Something went wrong!",
+                        style: styles.getSubHeadingStyle())
+                      );
+                    }
 
-          if (snapshot.connectionState == ConnectionState.done) {
-            Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                    if (snapshot.hasData && !snapshot.data!.exists) {
+                      return Center(
+                        child: Text(
+                          "Could not fetch data for '$username'!",
+                          style: styles.getSubHeadingStyle()
+                        )
+                      );
+                    }
 
-            return Column(
-              children: [
-                Container(
-                  margin: styles.getDefaultInsets(),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    border: Border.all(color: const Color.fromARGB(255, 211, 211, 211)),
-                    color: styles.getBackgroundColor()
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+
+                      return Column(
                         children: [
                           Container(
-                            margin: styles.getDefaultInsets(),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.yellow,
-                              minRadius: 40,
-                              child: Text("${data['first_name'][0]}${data['last_name'][0]}", style: styles.getSubHeadingStyle())
+                            margin: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
+                              boxShadow: [
+                                BoxShadow(
+                                  spreadRadius: 2,
+                                  blurRadius: 7,
+                                  offset: const Offset(0, 3),
+                                  color: Colors.black.withOpacity(0.1)
+                                ),
+                                BoxShadow(
+                                  blurRadius: 1,
+                                  offset: const Offset(0, 1),
+                                  color: Colors.black.withOpacity(0.1)
+                                )
+                              ]
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      margin: styles.getDefaultInsets(),
+                                      child: CircleAvatar(
+                                        backgroundColor: AppStyles.secondaryColor(isDarkMode),
+                                        minRadius: 60,
+                                        child: Text(
+                                          "${data['first_name'][0]}${data['last_name'][0]}",
+                                          style: TextStyle(
+                                            fontFamily: 'Geologica',
+                                            fontSize: 48,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppStyles.textColor(isDarkMode).withOpacity(0.5),
+                                          )
+                                        )
+                                      )
+                                    ),
+                                    Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.all(5),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${data['first_name']} ${data['last_name']}",
+                                              style: TextStyle(
+                                                fontFamily: 'Geologica',
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppStyles.textColor(isDarkMode),
+                                              )
+                                            ),
+                                            Text(
+                                              "@$username",
+                                              style: TextStyle(
+                                                fontFamily: 'Geologica',
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppStyles.accentColor(isDarkMode),
+                                              )
+                                            )
+                                          ],
+                                        )
+                                      )
+                                    )
+                                  ]
+                                ),
+                                Divider(
+                                  indent: 20,
+                                  endIndent: 20,
+                                  color: AppStyles.textColor(isDarkMode).withOpacity(0.25)
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                                  child: Text(
+                                    "User Info",
+                                    style: TextStyle(
+                                      fontFamily: 'Geologica',
+                                      fontWeight: FontWeight.w800,
+                                      color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
+                                    )
+                                  )
+                                ),
+                                ListView(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  children: [
+                                    AccountPageEntry(
+                                      prefs: prefs,
+                                      entryName: "Name",
+                                      icon: CupertinoIcons.person_solid,
+                                      text: "${data['first_name']} ${data['last_name']}",
+                                      onPress: () {
+                                        editNameDialog(context, username, data, firstNameController, lastNameController);
+                                      }
+                                    ),
+                                    AccountPageEntry(
+                                      prefs: prefs,
+                                      entryName: "Birthdate",
+                                      icon: CupertinoIcons.calendar,
+                                      text: formatTimestamp((data['birthdate'] as Timestamp).toDate(), asText: true),
+                                      onPress: () {
+                                        editBirthdateDialog(context, username, data);
+                                      }
+                                    ),
+                                  ]
+                                )
+                              ]
                             )
                           ),
-                          Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.all(5),
-                              child: Text(
-                                username,
-                                style: const TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w600,
-                                  fontStyle: FontStyle.italic
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
+                              boxShadow: [
+                                BoxShadow(
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 3),
+                                  color: Colors.black.withOpacity(0.05)
+                                ),
+                                BoxShadow(
+                                  blurRadius: 1,
+                                  offset: const Offset(0, 1),
+                                  color: Colors.black.withOpacity(0.1)
                                 )
-                              )
+                              ]
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                                  child: Text(
+                                    "Account Info",
+                                    style: TextStyle(
+                                      fontFamily: 'Geologica',
+                                      fontWeight: FontWeight.w800,
+                                      color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
+                                    )
+                                  )
+                                ),
+                                ListView(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  children: [
+                                    AccountPageEntry(
+                                      prefs: prefs,
+                                      entryName: "E-mail",
+                                      icon: CupertinoIcons.mail_solid,
+                                      text: "${data['email']}",
+                                      onPress: () {
+                                        editEmailDialog(context, username, data, emailController, emailConfirmController);
+                                      }
+                                    ),
+                                    AccountPageEntry(
+                                      prefs: prefs,
+                                      entryName: "Password",
+                                      icon: CupertinoIcons.lock_fill,
+                                      text: "${data['password']}",
+                                      onPress: () {
+                                        editPasswordDialog(context, username, data, currentPasswordController, newPasswordController, confirmPasswordController);
+                                      },
+                                      hideText: true
+                                    )
+                                  ],
+                                ),
+                              ],
+                            )
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
+                              boxShadow: [
+                                BoxShadow(
+                                  spreadRadius: 1,
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 3),
+                                  color: Colors.black.withOpacity(0.05)
+                                ),
+                                BoxShadow(
+                                  blurRadius: 1,
+                                  offset: const Offset(0, 1),
+                                  color: Colors.black.withOpacity(0.1)
+                                )
+                              ]
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                                  child: Text(
+                                    "Settings",
+                                    style: TextStyle(
+                                      fontFamily: 'Geologica',
+                                      fontWeight: FontWeight.w800,
+                                      color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
+                                    )
+                                  )
+                                ),
+                                ListView(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  children: [
+                                    DarkModeToggleEntry(prefs: prefs, refreshParent: refresh)
+                                  ],
+                                ),
+                              ],
                             )
                           )
                         ]
-                      ),
-                      ListView(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        children: [
-                          generateUserEntry(
-                            "Name",
-                            CupertinoIcons.person_crop_circle_fill,
-                            "${data['first_name']} ${data['last_name']}",
-                            () {
-                              editNameDialog(context, username, data, firstNameController, lastNameController);
-                            }
-                          ),
-                          generateUserEntry(
-                            "Birthdate",
-                            CupertinoIcons.calendar,
-                            formatTimestamp((data['birthdate'] as Timestamp).toDate()),
-                            () {
-                              editBirthdateDialog(context, username, data);
-                            }
-                          ),
-                        ]
-                      )
-                    ]
-                  )
-                ),
-                Container(
-                  margin: styles.getDefaultInsets(),
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    border: Border.all(color: const Color.fromARGB(255, 211, 211, 211)),
-                    color: styles.getBackgroundColor()
-                  ),
-                  child: ListView(
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    children: [
-                      generateUserEntry(
-                        "E-mail",
-                        CupertinoIcons.mail_solid,
-                        "${data['email']}",
-                        () {
-                          editEmailDialog(context, username, data, emailController, emailConfirmController);
-                        }
-                      ),
-                      generateUserEntry(
-                        "Password",
-                        CupertinoIcons.lock_fill,
-                        "${data['password']}",
-                        () {
-                          editPasswordDialog(context, username, data, currentPasswordController, newPasswordController, confirmPasswordController);
-                        },
-                        true
-                      )
-                    ],
-                  )
-                )
-              ]
-            );
-          }
+                      );
+                    }
 
-          return Center(
-            child: Text("Loading...", style: styles.getSubHeadingStyle())
-          );
-        },
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Loading @$username's Info",
+                            style: TextStyle(
+                              fontFamily: 'Geologica',
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: AppStyles.accentColor(isDarkMode)
+                            )
+                          ),
+                          const SizedBox(height: 10),
+                          LoadingAnimationWidget.threeArchedCircle(
+                            color: AppStyles.accentColor(isDarkMode),
+                            size: 50,
+                          )
+                        ],
+                      )
+                    );
+                  }
+                );
+              }
+
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Connecting...",
+                      style: TextStyle(
+                        fontFamily: 'Geologica',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppStyles.accentColor(isDarkMode)
+                      )
+                    ),
+                    const SizedBox(height: 10),
+                    LoadingAnimationWidget.threeArchedCircle(
+                      color: AppStyles.accentColor(isDarkMode),
+                      size: 50,
+                    )
+                  ],
+                )
+              );
+            }
+          ),
+        ],
       )
     );
   }
 }
+
