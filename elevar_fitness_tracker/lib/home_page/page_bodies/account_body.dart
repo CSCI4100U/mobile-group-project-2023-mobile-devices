@@ -15,26 +15,8 @@ class AccountBody extends StatefulWidget {
 
   @override
   State<AccountBody> createState() => _AccountBodyState();
-}
 
-class _AccountBodyState extends State<AccountBody> {
-  SharedPreferences? prefs;
-  String username = "";
-  AppStyles styles = AppStyles(); // TODO: replace with new app styles
-
-  @override
-  void initState() {
-    super.initState();
-
-    SharedPreferences.getInstance().then((sharedPrefs) {
-      setState(() {
-        prefs = sharedPrefs;
-        username = prefs?.getString('username') ?? "";
-      });
-    });
-  }
-  
-  String formatTimestamp(DateTime date, {bool asText = false}) {
+  static String formatTimestamp(DateTime date, {bool asText = false}) {
     const Map<int, String> months = {
       1: "January",
       2: "February",
@@ -53,6 +35,24 @@ class _AccountBodyState extends State<AccountBody> {
     return asText ?
       "${months[date.month]} ${date.day}, ${date.year}" :
       "${date.year.toString()}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}";
+  }
+}
+
+class _AccountBodyState extends State<AccountBody> {
+  SharedPreferences? prefs;
+  String username = "";
+  AppStyles styles = AppStyles(); // TODO: replace with new app styles
+
+  @override
+  void initState() {
+    super.initState();
+
+    SharedPreferences.getInstance().then((sharedPrefs) {
+      setState(() {
+        prefs = sharedPrefs;
+        username = prefs?.getString('username') ?? "";
+      });
+    });
   }
 
   void editNameDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController firstNameController, TextEditingController lastNameController) {
@@ -131,7 +131,7 @@ class _AccountBodyState extends State<AccountBody> {
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Updated birthdate to \"${formatTimestamp(Timestamp.fromDate(picked).toDate())}\"")
+          content: Text("Updated birthdate to \"${AccountBody.formatTimestamp(Timestamp.fromDate(picked).toDate())}\"")
         )
       );      
     } 
@@ -467,7 +467,7 @@ class _AccountBodyState extends State<AccountBody> {
                                       prefs: prefs,
                                       entryName: "Birthdate",
                                       icon: CupertinoIcons.calendar,
-                                      text: formatTimestamp((data['birthdate'] as Timestamp).toDate(), asText: true),
+                                      text: AccountBody.formatTimestamp((data['birthdate'] as Timestamp).toDate(), asText: true),
                                       onPress: () {
                                         editBirthdateDialog(context, username, data);
                                       }

@@ -31,7 +31,7 @@ class RoundedButtonState extends State<RoundedButton> {
             backgroundColor: MaterialStateProperty.all(AppStyles.primaryColor(widget.prefs?.getBool('darkmode') ?? false))
           ),
           child: Text(
-            "Login",
+            widget.text,
             style: TextStyle(
               fontFamily: 'Geologica',
               fontSize: 20,
