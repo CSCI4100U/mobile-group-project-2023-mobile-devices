@@ -16,6 +16,10 @@ class AccountBody extends StatefulWidget {
   @override
   State<AccountBody> createState() => _AccountBodyState();
 
+  // Converts a date into a readable string for displaying to
+  // the user, either in "January 1, 1970" if asText is true,
+  // or as "1970/01/01" is asText is false.
+  // Static since it also gets used in the signup process.
   static String formatTimestamp(DateTime date, {bool asText = false}) {
     const Map<int, String> months = {
       1: "January",
@@ -50,11 +54,14 @@ class _AccountBodyState extends State<AccountBody> {
     SharedPreferences.getInstance().then((sharedPrefs) {
       setState(() {
         prefs = sharedPrefs;
+        // We get the username stored in local storage so we can grab it's
+        // relevent information from the cloud later on.
         username = prefs?.getString('username') ?? "";
       });
     });
   }
 
+  // Display a dialog for editing the name fields (first and last)
   void editNameDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController firstNameController, TextEditingController lastNameController) {
     firstNameController.text = data['first_name'];
     lastNameController.text = data['last_name'];
@@ -110,6 +117,7 @@ class _AccountBodyState extends State<AccountBody> {
     );
   }
 
+  // Display a dialog for editing the birthdate field
   void editBirthdateDialog(BuildContext context, String username, Map<String, dynamic> data) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -137,6 +145,10 @@ class _AccountBodyState extends State<AccountBody> {
     } 
   }
 
+  // Display a dialog for editing the email field.
+  // Makes the user enter the new e-mail twice to confirm,
+  // as well as starting with the first text field auto-
+  // filled in case they only need to make a minor change.
   void editEmailDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController emailController, TextEditingController confirmController) async {
     emailController.text = data['email'];
     final editEmailFormKey = GlobalKey<FormState>();
@@ -198,6 +210,9 @@ class _AccountBodyState extends State<AccountBody> {
     );
   }
 
+  // Display a dialog for editing the password field.
+  // Makes the user enter the current password, and the
+  // new password twice for confirmation purposes.
   void editPasswordDialog(BuildContext context, String username, Map<String, dynamic> data, TextEditingController currentPassword, TextEditingController newPassword, TextEditingController confirmNewPassword) async {
     final editPasswordFormKey = GlobalKey<FormState>();
 
@@ -334,6 +349,13 @@ class _AccountBodyState extends State<AccountBody> {
       body: Stack(
         children: [
           Container(
+            // When in light mode, we want the background to be slightly darker than foreground
+            // elements, so we overlay a bit of the primary color over the white background.
+            // However, applying the same logic in dark mode would result in a slightly tinted
+            // background with black foreground elements, which is the opposite of what we want.
+            // Therefore, we flip the colouring logic of this background and of the foreground
+            // elements based on if we're in dark mode or not. You'll see this throughout this
+            // doc, the next comment block down is an example of foreground elements.
             color: isDarkMode ? Colors.transparent : AppStyles.primaryColor(isDarkMode).withOpacity(0.2)
           ),
           FutureBuilder(
@@ -368,8 +390,17 @@ class _AccountBodyState extends State<AccountBody> {
                             margin: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               borderRadius: const BorderRadius.all(Radius.circular(20)),
+                              // Here! Is where we handle the colouring of foreground elements
+                              // depending on if we're in light or dark mode. See comment above
+                              // for context.
+                              // This happens a few more times throughout this doc (for every
+                              // user information container we have), so I will not comment on it
+                              // past this point, but keep it in mind.
                               color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
                               boxShadow: [
+                                // One softer, blurrier shadow combined with a sharper
+                                // shadow to create a sense of layering. Idea shamelessly
+                                // taken from Microsoft's Fluent 2 design docs.
                                 BoxShadow(
                                   spreadRadius: 2,
                                   blurRadius: 7,
@@ -585,6 +616,8 @@ class _AccountBodyState extends State<AccountBody> {
                       );
                     }
 
+                    // While we haven't finished loading the user information from
+                    // the cloud, display a simple loading screen.
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -611,6 +644,8 @@ class _AccountBodyState extends State<AccountBody> {
                 );
               }
 
+              // While we aren't sure of the current status from the cloud,
+              // display a simple loading screen.
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -81,6 +81,11 @@ class AppStyles {
    * 
    */
 
+  // Note about these colour codes:
+  // If you ever need to change the opacity, USE THE withOpacity() method!
+  // Example: AppStyles.accentColor(isDarkMode).withOpacity(0.5) for accentColor
+  // with half opacity.
+
   static Color textColor(bool darkMode) {
     return darkMode ? const Color(0xfffbf4f6) : const Color(0xff0b0406);
   }
@@ -102,6 +107,10 @@ class AppStyles {
   }
 }
 
+// This method lets you create a color from a string representing a hex code,
+// I honestly don't remember what I was using it for, but maybe it'll be useful
+// to someone else eventually.
+// If a hex code without alpha is provided, it defaults to 255.
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {
     hexColor = hexColor.replaceAll("#", "");
