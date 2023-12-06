@@ -5,14 +5,16 @@ import 'package:elevar_fitness_tracker/local_storage/exercises_db_model.dart';
 class statsBody extends StatelessWidget {
   final AppStyles styles = AppStyles();
   final ExerciseDBModel dbModel = ExerciseDBModel();
+  bool darkmode = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppStyles.primaryColor(darkmode).withOpacity(0.2),
       appBar: AppBar(
         title: Text("Your Statistics",
-            style: styles.getHeadingStyle(Colors.white)),
-        backgroundColor: styles.getObjectColor(),
+            style: AppStyles.getHeadingStyle(darkmode)),
+        backgroundColor: AppStyles.primaryColor(darkmode),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         // get the max stats for each exercise
@@ -30,10 +32,10 @@ class statsBody extends StatelessWidget {
                 var exercise = maxStats[index];
                 return ListTile(
                   title:
-                      Text(exercise['name'], style: styles.getSubHeadingStyle()),
+                      Text(exercise['name'], style: AppStyles.getSubHeadingStyle(darkmode)),
                   subtitle: Text(
                     'Max Reps: ${exercise['maxReps']} | Max Weight: ${exercise['maxWeight']} lbs',
-                    style: styles.getMainTextStyle(),
+                    style: AppStyles.getMainTextStyle(darkmode),
                   ),
                 );
               },
