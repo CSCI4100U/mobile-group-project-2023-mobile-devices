@@ -98,7 +98,13 @@ class AccountInfoState extends State<AccountInfoBody> {
         'first_name': firstNameController.text,
         'last_name': lastNameController.text,
         'birthdate': Timestamp.fromDate(birthdate ?? DateTime.now())
-      });
+
+           });
+        //Save the user's name in SharePreferences
+        widget.prefs?.setString('first_name', firstNameController.text);
+        widget.prefs?.setString('last_name', lastNameController.text);
+      
+
     }
 
     return Scaffold(

@@ -1,12 +1,14 @@
 /*
   This file returns the encapsulating body widget for the Home page
 */
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:elevar_fitness_tracker/notifications/notifications.dart';
 import 'package:elevar_fitness_tracker/notifications/notification_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeBody extends StatefulWidget {
   HomeBody({super.key});
@@ -16,7 +18,10 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   AppStyles styles = AppStyles();
-
+  String username = "";
+  String firstName = "";
+  String lastName = "";
+  SharedPreferences? prefs;
 //get out-of app notifications
 
   final notifications = Notifications();
@@ -39,8 +44,25 @@ class _HomeBodyState extends State<HomeBody> {
   void initState() {
     super.initState();
     initPlatformState();
+    _loadUserData();
   }
+    void _loadUserData() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      username = prefs?.getString('username') ?? "";
+    });
 
+    if (username.isNotEmpty) {
+      FirebaseFirestore.instance.collection('users').doc(username).get().then((snapshot) {
+        if (snapshot.exists) {
+          setState(() {
+            firstName = snapshot.data()?['first_name'] ?? "";
+            lastName = snapshot.data()?['last_name'] ?? "";
+          });
+        }
+      });
+    }
+  }
   void _trackStepCount(StepCount event) {
     setState(() {
       _stepCount = event.steps.toString();
@@ -113,23 +135,34 @@ class _HomeBodyState extends State<HomeBody> {
 
     return Scaffold(
       key: scaffoldKey,
-      appBar: AppBar(
-        title: Text("Home", style: styles.getHeadingStyle(Colors.white)),
-        backgroundColor: styles.getObjectColor(),
-        actions: [
-          ElevatedButton(
-            child: Icon(currentNotifIcon),
-            onPressed: handleNotifButton,
-            onLongPress: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: ((context) => const NotifPage()),
-                  ));
-            },
-          )
-        ],
-      ),
+      appBar:AppBar(
+        backgroundColor: styles.getObjectColor(), 
+        title: Row(
+        children: <Widget>[
+        Text("Welcome Back", 
+    
+        style: styles.getHeadingStyle(Colors.white),
+        ), 
+        
+    ],
+  ),
+  actions: <Widget>[
+    ElevatedButton(
+      child: Icon(currentNotifIcon),
+      onPressed: handleNotifButton,
+      onLongPress: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: ((context) => const NotifPage()),
+          ),
+        );
+      },
+    ),
+    
+  ],
+),
+
       body: Padding(
         padding: const EdgeInsets.only(left: 10.0, right: 10.0, top:25.0, bottom: 10.0),
         child: Column(
