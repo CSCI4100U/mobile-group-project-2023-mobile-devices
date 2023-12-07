@@ -9,6 +9,7 @@ import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/workou
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'page_bodies/home_body.dart';
 import 'page_bodies/stats_body.dart';
 import 'page_bodies/account_body.dart';
@@ -36,31 +37,40 @@ class HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppStyles.backgroundColor(darkmode),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppStyles.backgroundColor(darkmode),
+        unselectedLabelStyle: const TextStyle(
+          fontFamily: 'Geologica'
+        ),
+        selectedLabelStyle: TextStyle(
+          fontFamily: 'Geologica',
+          color: AppStyles.primaryColor(darkmode),
+          fontWeight: FontWeight.w700
+        ),
         currentIndex: currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.graph_square, color: AppStyles.textColor(darkmode)),
+            icon: const Icon(CupertinoIcons.graph_square),
             activeIcon: Icon(CupertinoIcons.graph_square, color: AppStyles.primaryColor(darkmode)),
             label: "Stats"
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home, color: AppStyles.textColor(darkmode),),
+            icon: const Icon(CupertinoIcons.home),
             activeIcon: Icon(CupertinoIcons.home, color: AppStyles.primaryColor(darkmode)),
             label: "Home",
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_fill, color: AppStyles.textColor(darkmode)),
+            icon: const Icon(CupertinoIcons.person_fill),
             activeIcon: Icon(CupertinoIcons.person_fill, color: AppStyles.primaryColor(darkmode)),
             label: "Account",
           )
         ],
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppStyles.highlightColor(darkmode),
-        unselectedItemColor: AppStyles.textColor(darkmode),
+        selectedItemColor: AppStyles.textColor(darkmode),
+        unselectedItemColor: AppStyles.accentColor(darkmode),
+        unselectedIconTheme: IconThemeData(color: AppStyles.accentColor(darkmode)),
         onTap: (value) {
           setState(() {
             currentIndex = value;
