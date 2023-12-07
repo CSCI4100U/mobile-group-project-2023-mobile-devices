@@ -30,7 +30,7 @@ class HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    pages = {0:statsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
+    pages = {0:StatsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
   }
 
   @override
