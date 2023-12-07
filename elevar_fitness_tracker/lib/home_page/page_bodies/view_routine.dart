@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:elevar_fitness_tracker/local_storage/routine_db_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RoutineView extends StatefulWidget {
   RoutineView(this.routineTitle);
@@ -19,6 +20,20 @@ class RoutineViewState extends State<RoutineView> {
   RoutineDBModel database = RoutineDBModel();
   bool refresh = true;
 
+  // Local prefs
+  SharedPreferences? prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((sharedPrefs) {
+      setState(() {
+        prefs = sharedPrefs;
+        darkmode = prefs?.getBool('darkmode') ?? false;
+      });
+    });
+  }
+
   Future init() async {
     exercises = await database.getRoutine(widget.routineTitle);
   }
@@ -34,8 +49,12 @@ class RoutineViewState extends State<RoutineView> {
     }
 
     return Scaffold(
+      backgroundColor: AppStyles.backgroundColor(darkmode),
       appBar: AppBar(
-        title: Text(widget.routineTitle, style: AppStyles.getHeadingStyle(darkmode),),
+        title: Text(
+          widget.routineTitle,
+          style: AppStyles.getHeadingStyle(darkmode),
+        ),
         backgroundColor: AppStyles.primaryColor(darkmode),
       ),
       body: Container(
@@ -60,6 +79,7 @@ class RoutineViewState extends State<RoutineView> {
   Widget getWorkoutItem(Map<String,dynamic> exercise, int index,) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      color: darkmode ? AppStyles.primaryColor(darkmode).withOpacity(0.2) : AppStyles.backgroundColor(darkmode),
       child: Column(
         children: [
           ListTile(
@@ -81,14 +101,23 @@ class RoutineViewState extends State<RoutineView> {
                   padding: const EdgeInsets.only(right: 20.0, left: 40.0),
                   child: Text(
                     'Reps: ${exercise['heavySetReps'] ?? 'n/a'}',
-                    style: AppStyles.getMainTextStyle(darkmode),
+                    style: TextStyle(
+                      fontFamily: 'Geologica',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppStyles.accentColor(darkmode)
+                    ),
                   ),
                 ),
                 Text(
                     'Weight: ${exercise['weight'] ?? 'n/a'} lbs',
-                    style: AppStyles.getMainTextStyle(darkmode),
+                    style: TextStyle(
+                      fontFamily: 'Geologica',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppStyles.accentColor(darkmode)
+                    ),
                 ),
-                
               ],
             ),
             onTap: () => _showInputExerciseDialog(exercise),
@@ -106,7 +135,7 @@ class RoutineViewState extends State<RoutineView> {
       context: context, 
       builder:(context) {
         return AlertDialog(
-          title: Text('Edit sets', style: AppStyles.getSubHeadingStyle(darkmode),),
+          title: Text('Edit sets', style: AppStyles.getSubHeadingStyle(false),),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -117,7 +146,7 @@ class RoutineViewState extends State<RoutineView> {
                   : exercise['heavySetReps'].toString(),
                 ),
                 keyboardType: TextInputType.number,
-                style: AppStyles.getMainTextStyle(darkmode),
+                style: AppStyles.getMainTextStyle(false),
               ),
               TextField(
                 controller: weightController,
@@ -126,7 +155,7 @@ class RoutineViewState extends State<RoutineView> {
                   : exercise['weight'].toString(),
                 ),
                 keyboardType: TextInputType.number,
-                style: AppStyles.getMainTextStyle(darkmode),
+                style: AppStyles.getMainTextStyle(false),
               ),
             ],
           ),
@@ -135,10 +164,10 @@ class RoutineViewState extends State<RoutineView> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text("Cancel", style: AppStyles.getSubHeadingStyle(darkmode),),
+              child: Text("Cancel", style: AppStyles.getSubHeadingStyle(false),),
             ),
             TextButton(
-              child: Text('Save', style: AppStyles.getSubHeadingStyle(darkmode),),
+              child: Text('Save', style: AppStyles.getSubHeadingStyle(false),),
               onPressed: () async {
                 int? reps = int.tryParse(repsController.text);
                 double? weight;
