@@ -163,9 +163,11 @@ class HomeBodyState extends State<HomeBody> {
     notifications.init();
     if(refresh) {
       initRoutineData().then((value) {
-        setState(() {
-          refresh = false;
-        });
+        if (context.mounted) {
+          setState(() {
+            refresh = false;
+          });
+        }
       });
     }
 
