@@ -1,5 +1,6 @@
 import 'package:elevar_fitness_tracker/components/rounded_button.dart';
 import 'package:elevar_fitness_tracker/components/rounded_input_field.dart';
+import 'package:elevar_fitness_tracker/home_page/homepage.dart';
 import 'package:elevar_fitness_tracker/login_signup_page/account_info_body.dart';
 import 'package:elevar_fitness_tracker/login_signup_page/login_signup_page.dart';
 import 'package:flutter/material.dart';
@@ -221,6 +222,42 @@ class SignupBodyState extends State<SignupBody> {
                     }
                   });
                 }, widget.prefs),
+                Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "or ",
+                    style: TextStyle(
+                      fontFamily: 'Geologica',
+                      fontSize: 14,
+                      color: AppStyles.accentColor(isDarkMode).withOpacity(0.5)
+                    )
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      widget.prefs?.setString('username', '');
+                      widget.prefs?.setString('password', '');
+        
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                      );
+                    },
+                    child: Text(
+                      "continue as guest",
+                      style: TextStyle(
+                        fontFamily: 'Geologica',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppStyles.primaryColor(!isDarkMode).withOpacity(0.5)
+                      )
+                    )
+                  )
+                ],
+              ),
+            ),
               ],
             ),
             const Spacer(),

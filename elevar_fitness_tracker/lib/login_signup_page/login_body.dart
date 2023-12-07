@@ -168,6 +168,42 @@ class LoginBodyState extends State<LoginBody> {
                 }
               });
             }, widget.prefs),
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "or ",
+                    style: TextStyle(
+                      fontFamily: 'Geologica',
+                      fontSize: 14,
+                      color: AppStyles.accentColor(isDarkMode).withOpacity(0.5)
+                    )
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      widget.prefs?.setString('username', '');
+                      widget.prefs?.setString('password', '');
+        
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const HomePage()),
+                      );
+                    },
+                    child: Text(
+                      "continue as guest",
+                      style: TextStyle(
+                        fontFamily: 'Geologica',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppStyles.primaryColor(!isDarkMode).withOpacity(0.5)
+                      )
+                    )
+                  )
+                ],
+              ),
+            ),
             const Spacer(),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 40),

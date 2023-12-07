@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:elevar_fitness_tracker/components/account_page_entry.dart';
+import 'package:elevar_fitness_tracker/components/rounded_button.dart';
 import 'package:elevar_fitness_tracker/login_signup_page/login_signup_page.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -519,7 +520,50 @@ class _AccountBodyState extends State<AccountBody> {
               // doc, the next comment block down is an example of foreground elements.
               color: isDarkMode ? Colors.transparent : AppStyles.primaryColor(isDarkMode).withOpacity(0.2)
             ),
-            FutureBuilder(
+            username.isEmpty
+            ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Want to track account info?",
+                    style: TextStyle(
+                      fontFamily: 'Geologica',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: AppStyles.textColor(isDarkMode)
+                    )
+                  ),
+                  const SizedBox(height: 60),
+                  RoundedButton("Login", () {
+                    prefs?.setString('username', '');
+                    prefs?.setString('password', '');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginSignupPage()),
+                    );
+                  }, prefs),
+                  Text(
+                    "or",
+                    style: TextStyle(
+                      fontFamily: 'Geologica',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: AppStyles.textColor(isDarkMode).withOpacity(0.5)
+                    )
+                  ),
+                  RoundedButton("Signup", () {
+                    prefs?.setString('username', '');
+                    prefs?.setString('password', '');
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LoginSignupPage(showSignup: true)),
+                    );
+                  }, prefs),
+                ],
+              ),
+            )
+            : FutureBuilder(
               future: SharedPreferences.getInstance(),
               builder: (BuildContext context0, AsyncSnapshot<SharedPreferences> snapshot0) {
                 if (snapshot0.connectionState == ConnectionState.done) {
