@@ -10,13 +10,14 @@ class NotifPage extends StatefulWidget {
 
 class _NotifPageState extends State<NotifPage> {
   AppStyles styles = AppStyles();
+  bool darkmode = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Notifications", style: styles.getHeadingStyle()),
-        backgroundColor: styles.getHighlightColor(),
+        title: Text("Notifications", style: AppStyles.getHeadingStyle(darkmode)),
+        backgroundColor: AppStyles.highlightColor(darkmode),
       ),
       body: ListView(children: const [
         ListTile(

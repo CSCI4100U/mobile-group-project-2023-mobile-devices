@@ -46,6 +46,7 @@ class _AccountBodyState extends State<AccountBody> {
   SharedPreferences? prefs;
   String username = "";
   AppStyles styles = AppStyles(); // TODO: replace with new app styles
+  bool darkmode = false;
 
   @override
   void initState() {
@@ -70,7 +71,7 @@ class _AccountBodyState extends State<AccountBody> {
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
-          title: Text('Edit Name', style: styles.getSubHeadingStyle()),
+          title: Text('Edit Name', style: AppStyles.getSubHeadingStyle(darkmode)),
           content: Form(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -94,7 +95,7 @@ class _AccountBodyState extends State<AccountBody> {
               }
             ),
             MaterialButton(
-              color: styles.getHighlightColor(),
+              color: AppStyles.highlightColor(darkmode),
               child: const Text("Confirm"),
               onPressed: () {
                 FirebaseFirestore.instance.collection('users').doc(username).update({
@@ -157,7 +158,7 @@ class _AccountBodyState extends State<AccountBody> {
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
-          title: Text('Edit Email', style: styles.getSubHeadingStyle()),
+          title: Text('Edit Email', style: AppStyles.getSubHeadingStyle(darkmode)),
           content: Form(
             key: editEmailFormKey,
             child: Column(
@@ -186,7 +187,7 @@ class _AccountBodyState extends State<AccountBody> {
               }
             ),
             MaterialButton(
-              color: styles.getHighlightColor(),
+              color: AppStyles.highlightColor(darkmode),
               child: const Text("Confirm"),
               onPressed: () {
                 if (editEmailFormKey.currentState!.validate()) {
@@ -220,7 +221,7 @@ class _AccountBodyState extends State<AccountBody> {
       context: context,
       builder: (BuildContext ctx) {
         return AlertDialog(
-          title: Text('Edit Password', style: styles.getSubHeadingStyle()),
+          title: Text('Edit Password', style: AppStyles.getSubHeadingStyle(darkmode)),
           content: Form(
             key: editPasswordFormKey,
             child: Column(
@@ -264,7 +265,7 @@ class _AccountBodyState extends State<AccountBody> {
               }
             ),
             MaterialButton(
-              color: styles.getHighlightColor(),
+              color: AppStyles.highlightColor(darkmode),
               child: const Text("Confirm"),
               onPressed: () {
                 if (editPasswordFormKey.currentState!.validate()) {
@@ -368,7 +369,7 @@ class _AccountBodyState extends State<AccountBody> {
                     if (snapshot.hasError) {
                       return Center(
                         child: Text("Something went wrong!",
-                        style: styles.getSubHeadingStyle())
+                        style: AppStyles.getSubHeadingStyle(darkmode))
                       );
                     }
 
@@ -376,7 +377,7 @@ class _AccountBodyState extends State<AccountBody> {
                       return Center(
                         child: Text(
                           "Could not fetch data for '$username'!",
-                          style: styles.getSubHeadingStyle()
+                          style: AppStyles.getSubHeadingStyle(darkmode)
                         )
                       );
                     }
@@ -420,7 +421,7 @@ class _AccountBodyState extends State<AccountBody> {
                                 Row(
                                   children: [
                                     Container(
-                                      margin: styles.getDefaultInsets(),
+                                      margin: AppStyles.getDefaultInsets(),
                                       child: CircleAvatar(
                                         backgroundColor: AppStyles.secondaryColor(isDarkMode),
                                         minRadius: 60,

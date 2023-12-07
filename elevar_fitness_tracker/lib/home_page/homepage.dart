@@ -25,36 +25,43 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   AppStyles styles = AppStyles(); // initializing our styles object
   int currentIndex = 1; // the currently selected page (default is home page)
-  Map pages = {0:statsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
-  //ExerciseDBModel database = ExerciseDBModel();
+  late Map pages;
+  bool darkmode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = {0:statsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppStyles.backgroundColor(darkmode),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.graph_square, color: styles.getObjectColor()),
-            activeIcon: Icon(CupertinoIcons.graph_square, color: styles.getHighlightColor()),
+            icon: Icon(CupertinoIcons.graph_square, color: AppStyles.textColor(darkmode)),
+            activeIcon: Icon(CupertinoIcons.graph_square, color: AppStyles.primaryColor(darkmode)),
             label: "Stats"
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home, color: styles.getObjectColor(),),
-            activeIcon: Icon(CupertinoIcons.home, color: styles.getHighlightColor(),),
+            icon: Icon(CupertinoIcons.home, color: AppStyles.textColor(darkmode),),
+            activeIcon: Icon(CupertinoIcons.home, color: AppStyles.primaryColor(darkmode)),
             label: "Home",
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_fill, color: styles.getObjectColor()),
-            activeIcon: Icon(CupertinoIcons.person_fill, color: styles.getHighlightColor()),
+            icon: Icon(CupertinoIcons.person_fill, color: AppStyles.textColor(darkmode)),
+            activeIcon: Icon(CupertinoIcons.person_fill, color: AppStyles.primaryColor(darkmode)),
             label: "Account",
           )
         ],
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: styles.getHighlightColor(),
-        unselectedItemColor: styles.getObjectColor(),
+        selectedItemColor: AppStyles.highlightColor(darkmode),
+        unselectedItemColor: AppStyles.textColor(darkmode),
         onTap: (value) {
           setState(() {
             currentIndex = value;
@@ -64,16 +71,16 @@ class HomePageState extends State<HomePage> {
 
       floatingActionButton: currentIndex == 1? FloatingActionButton(
         // later somehow change the icon to a dumbell or something similar
-        onPressed: () {
+        onPressed: () async {
           Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const WorkoutPage()),
           );
         },
-        backgroundColor: styles.getBackgroundColor(),
-        focusColor: styles.getHighlightColor(),
+        backgroundColor: AppStyles.backgroundColor(darkmode),
+        focusColor: AppStyles.highlightColor(darkmode),
         tooltip: "Create a new workout",
-        child: Icon(Icons.add, size: 24, color: styles.getObjectColor()),
+        child: Icon(Icons.add, size: 24, color: AppStyles.textColor(darkmode)),
         /*
         const ImageIcon(
           AssetImage('lib/img/dumbell.png'),

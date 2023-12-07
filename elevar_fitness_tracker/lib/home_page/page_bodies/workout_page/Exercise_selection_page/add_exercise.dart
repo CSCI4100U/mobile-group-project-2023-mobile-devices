@@ -23,6 +23,7 @@ class AddExerciseState extends State<AddExercise> {
   bool refresh = true;
   List<ExerciseItem> exercises = [];
   List<ExerciseItem> selectedExercises = [];
+  bool darkmode = false;
 
   final List<String> states = [
     'abdominals',
@@ -63,8 +64,8 @@ class AddExerciseState extends State<AddExercise> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exercises', style: styles.getHeadingStyle(Colors.white)),
-        backgroundColor: styles.getObjectColor(),
+        title: Text('Exercises', style: AppStyles.getHeadingStyle(darkmode)),
+        backgroundColor: AppStyles.primaryColor(darkmode),
       ),
       body: Column(
         children: [
@@ -81,7 +82,7 @@ class AddExerciseState extends State<AddExercise> {
                       value: item,
                       child: Text(
                         item,
-                        style: styles.getSubHeadingStyle(),
+                        style: AppStyles.getSubHeadingStyle(darkmode),
                       ),
                     );
                   }).toList(),
@@ -93,12 +94,12 @@ class AddExerciseState extends State<AddExercise> {
                   },
                   icon: Icon(
                     Icons.arrow_drop_down_circle_outlined,
-                    color: styles.getObjectColor(),
+                    color: AppStyles.accentColor(darkmode),
                   ),
                   decoration: InputDecoration(
                     labelText: "Select Muscle:",
                     focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: styles.getObjectColor())),
+                        borderSide: BorderSide(color: AppStyles.accentColor(darkmode))),
                   ),
                 )),
           ),
@@ -112,7 +113,7 @@ class AddExerciseState extends State<AddExercise> {
                     index);
               },
               separatorBuilder: (context, index) => Divider(
-                color: styles.getObjectColor(),
+                color: AppStyles.accentColor(darkmode),
               ),
               itemCount: exercises.length,
             ),
@@ -125,13 +126,13 @@ class AddExerciseState extends State<AddExercise> {
                 child: ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
-                        styles.getHighlightColor()),
+                        AppStyles.highlightColor(darkmode)),
                     elevation: MaterialStateProperty.all<double>(4.0),
                     side: MaterialStateProperty.all<BorderSide>(const BorderSide(color:Colors.black, width: 2.0))
                   ),
                   child: Text(
                     'Add All',
-                    style: styles.getSubHeadingStyle(Colors.black),
+                    style: AppStyles.getSubHeadingStyle(darkmode),
                   ),
                   onPressed: () {
                     Navigator.pop(context, selectedExercises);
@@ -153,26 +154,26 @@ class AddExerciseState extends State<AddExercise> {
     return ListTile(
       leading: Icon(
         Icons.area_chart,
-        color: styles.getHighlightColor(),
+        color: AppStyles.highlightColor(darkmode),
       ),
       title: Text(
         name,
-        style: styles.getSubHeadingStyle(),
+        style: AppStyles.getSubHeadingStyle(darkmode),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
         muscle,
-        style: styles.getMainTextStyle(styles.getObjectColor()),
+        style: AppStyles.getMainTextStyle(darkmode),
       ),
       trailing: isSelected
           ? Icon(
               Icons.check_box_rounded,
-              color: styles.getHighlightColor(),
+              color: AppStyles.highlightColor(darkmode),
             )
           : Icon(
               Icons.check_box_outline_blank_rounded,
-              color: styles.getObjectColor(),
+              color: AppStyles.accentColor(darkmode),
             ),
       onTap: () {
         setState(() {
