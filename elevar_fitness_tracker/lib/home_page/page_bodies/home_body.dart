@@ -8,6 +8,7 @@ import 'package:pedometer/pedometer.dart';
 import 'package:elevar_fitness_tracker/notifications/notifications.dart';
 import 'package:elevar_fitness_tracker/notifications/notification_page.dart';
 import 'package:elevar_fitness_tracker/local_storage/routine_db_model.dart';
+import 'view_routine.dart';
 
 class HomeBody extends StatefulWidget {
   const HomeBody({super.key});
@@ -18,7 +19,6 @@ class HomeBody extends StatefulWidget {
 class _HomeBodyState extends State<HomeBody> {
 
   // defining instance variables
-  AppStyles styles = AppStyles();
   RoutineDBModel database = RoutineDBModel();
   List<dynamic> routineNames = [];
   late List<Map<String,dynamic>> routineData = [];
@@ -182,17 +182,17 @@ class _HomeBodyState extends State<HomeBody> {
               height: 50.0,
               width: double.infinity,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  IconButton(
-                    onPressed: () {
+                  routineData.isNotEmpty ? IconButton(
+                    onPressed: () async {
                       setState(() {
                         refresh = true;
                       });
                     },
-                    icon: Icon(Icons.refresh, color: AppStyles.textColor(darkmode), size: 24,)
-                  )
+                    icon: Icon(Icons.refresh, color: AppStyles.textColor(darkmode), size: 24,),
+                  ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
                 ],
               )
             ),
@@ -223,7 +223,10 @@ class _HomeBodyState extends State<HomeBody> {
       ),
       trailing: IconButton(
         onPressed: () {
-          print("Placeholder for now");
+          Navigator.push(
+            context, 
+            MaterialPageRoute(builder:(context) => RoutineView(name),)
+          );
         },
         icon: Icon(Icons.more_horiz, color: AppStyles.textColor(darkmode),),
       ),
@@ -233,5 +236,5 @@ class _HomeBodyState extends State<HomeBody> {
       ),
       tileColor: AppStyles.backgroundColor(darkmode),
     );
-  }
+  } 
 }

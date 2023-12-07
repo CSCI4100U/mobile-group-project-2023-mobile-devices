@@ -9,7 +9,6 @@ class NotifPage extends StatefulWidget {
 }
 
 class _NotifPageState extends State<NotifPage> {
-  AppStyles styles = AppStyles();
   bool darkmode = false;
 
   @override

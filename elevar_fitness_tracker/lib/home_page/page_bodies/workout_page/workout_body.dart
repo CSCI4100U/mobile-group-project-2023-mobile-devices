@@ -12,7 +12,6 @@ class WorkoutPage extends StatefulWidget {
 }
 
 class WorkoutPageState extends State<WorkoutPage> {
-  AppStyles styles = AppStyles();
   List<Map<String,dynamic>> selectedExercises = [];
   RoutineDBModel database = RoutineDBModel();
   bool darkmode = false;
@@ -24,14 +23,15 @@ class WorkoutPageState extends State<WorkoutPage> {
         title: Text('Workout', style: AppStyles.getHeadingStyle(darkmode),),
         backgroundColor: AppStyles.primaryColor(darkmode),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           IconButton(
-            onPressed: selectedExercises.isNotEmpty ? () {
-              _showSaveWorkoutDialog();
-            } : null,
+            onPressed:() {
+              selectedExercises.isNotEmpty ? _showSaveWorkoutDialog()
+              : _throwSnackBarErrorMessage("Cannot save empty workout!");
+            },
             icon: Icon(Icons.save, color: AppStyles.textColor(darkmode),)
           )
         ],
@@ -40,12 +40,12 @@ class WorkoutPageState extends State<WorkoutPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 25.0),
+            padding: const EdgeInsets.symmetric(vertical: 25.0, horizontal: 25.0),
             child: SizedBox(
               width: double.infinity,
               child: TextButton(
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(AppStyles.highlightColor(darkmode)),
+                  backgroundColor: MaterialStateProperty.all<Color>(AppStyles.primaryColor(darkmode)),
                   elevation: MaterialStateProperty.all<double>(4.0),
                   side: MaterialStateProperty.all<BorderSide>(const BorderSide(color:Colors.black, width: 2.0))
                 ),
@@ -98,20 +98,25 @@ class WorkoutPageState extends State<WorkoutPage> {
               style: AppStyles.getSubHeadingStyle(darkmode),
             ),
             subtitle: Text(exercise['muscle'], style: AppStyles.getMainTextStyle(darkmode),),
+            trailing: IconButton(
+              onPressed: () {
+                selectedExercises.removeWhere((element) => element['exerciseName'] == exercise['exerciseName']);
+                setState(() {
+                  
+                });
+              },
+              icon: Icon(Icons.delete, size: 24, color: AppStyles.textColor(darkmode),),
+            ),
             isThreeLine: true,
             onTap: () => _showInputExerciseDialog(exercise),
           ),
           ListTile(
-            title: Text(
-              'Set:',
-              style: AppStyles.getSubHeadingStyle(darkmode),
-            ),
-            trailing: Row(
+            title: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
+                  padding: const EdgeInsets.only(right: 20.0, left: 40.0),
                   child: Text(
                     'Reps: ${exercise['heavySetReps'] ?? 'n/a'}',
                     style: AppStyles.getMainTextStyle(darkmode),
@@ -126,7 +131,6 @@ class WorkoutPageState extends State<WorkoutPage> {
             ),
             onTap: () => _showInputExerciseDialog(exercise),
           ),
-          // TODO: add button for adding a set
         ],
       ),
     );
@@ -227,6 +231,18 @@ class WorkoutPageState extends State<WorkoutPage> {
           ],
         );
       },
+    );
+  }
+
+  void _throwSnackBarErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message, 
+          textAlign: TextAlign.center,
+          style: AppStyles.getMainTextStyle(darkmode, Colors.white),
+        )
+      )
     );
   }
 

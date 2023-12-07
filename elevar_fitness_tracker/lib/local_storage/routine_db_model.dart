@@ -14,6 +14,35 @@ class RoutineDBModel {
     return id; 
   }
 
+  Future<int> updateExercise(String exerciseName, int reps, double weight) async {
+    final Database db = await DBUtils.init();
+    int id = 0;
+    
+    if (reps == 0) {
+      id = await db.update(
+        'Routines',
+        {'weight': weight},
+        where: "exerciseName = ?",
+        whereArgs: [exerciseName]
+      );
+    } else if (weight == 0.0) {
+      id = await db.update(
+        'Routines',
+        {'heavySetReps': reps},
+        where: "exerciseName = ?",
+        whereArgs: [exerciseName]
+      );
+    } else {
+      id = await db.update(
+        'Routines',
+        {'heavySetReps': reps, 'weight': weight},
+        where: "exerciseName = ?",
+        whereArgs: [exerciseName]
+      );
+    }
+    return id;
+  }
+
   Future<int> getNumDistinctRoutines() async {
     final Database db = await DBUtils.init();
 

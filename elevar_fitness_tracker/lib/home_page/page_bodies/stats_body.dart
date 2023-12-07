@@ -3,7 +3,6 @@ import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:elevar_fitness_tracker/local_storage/exercises_db_model.dart';
 
 class statsBody extends StatelessWidget {
-  final AppStyles styles = AppStyles();
   final ExerciseDBModel dbModel = ExerciseDBModel();
   bool darkmode = false;
 

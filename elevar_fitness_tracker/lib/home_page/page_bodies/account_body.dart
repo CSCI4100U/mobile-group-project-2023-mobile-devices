@@ -45,7 +45,6 @@ class AccountBody extends StatefulWidget {
 class _AccountBodyState extends State<AccountBody> {
   SharedPreferences? prefs;
   String username = "";
-  AppStyles styles = AppStyles(); // TODO: replace with new app styles
   bool darkmode = false;
 
   @override
