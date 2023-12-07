@@ -12,7 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'view_routine.dart';
 
 class HomeBody extends StatefulWidget {
-  const HomeBody({super.key});
+  Function updatePage;
+  HomeBody(this.updatePage, {super.key});
   @override
   State<HomeBody> createState() => _HomeBodyState();
 }
@@ -175,114 +176,125 @@ class _HomeBodyState extends State<HomeBody> {
           )
         ],
       ),
-      body: Stack(
-        children: [
-          Container(
-            color: darkmode ? Colors.transparent : AppStyles.primaryColor(darkmode).withOpacity(0.2)
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0, right: 10.0, top:25.0, bottom: 10.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox( // holds the pedometer step count
-                  width: double.infinity,
-                  height: 150.0,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Container(
-                        width: 150.0,
-                        height: 150.0,
-                        decoration: BoxDecoration(
-                          color: AppStyles.secondaryColor(darkmode),
-                          borderRadius: BorderRadius.circular(100.0),
-                          border: Border.all(
-                            width: 4,
-                            color: AppStyles.secondaryColor(!darkmode).withOpacity(0.25)
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              spreadRadius: 1,
-                              blurRadius: 3,
-                              offset: const Offset(0, 3),
-                              color: Colors.black.withOpacity(0.05)
-                            ),
-                            BoxShadow(
-                              blurRadius: 1,
-                              offset: const Offset(0, 1),
-                              color: Colors.black.withOpacity(0.1)
-                            )
-                          ]
-                        ),
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            _stepCount,
-                            style: TextStyle(
-                              fontFamily: 'Geologica',
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: AppStyles.textColor(darkmode)
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Text(
-                            "steps",
-                            style: TextStyle(
-                              fontFamily: 'Geologica',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                              color: AppStyles.textColor(darkmode).withOpacity(0.6)
-                            ),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      )
-                      
-                    ],
-                  ),
-                ),
-          
-                SizedBox(
-                  height: 50.0,
-                  width: double.infinity,
-                  child: Row(
-                    mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      routineData.isNotEmpty ? IconButton(
-                        onPressed: () async {
-                          setState(() {
-                            refresh = true;
-                          });
-                        },
-                        icon: Icon(
-                          Icons.refresh,
-                          color: AppStyles.accentColor(darkmode),
-                          size: 24,
-                        ),
-                      ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
-                    ],
-                  )
-                ),
-          
-                Expanded( // holds this scrollable listview of routines
-                  child: ListView.separated(
-                    itemBuilder: (context, index) {
-                      return routineTile(routineNames[index], routineData.where((element) => element['routineName'] == routineNames[index]).toList());
-                    },
-                    separatorBuilder: (context, index) => const Divider(color: Colors.transparent),
-                    itemCount: routineNames.length,
-                  ),
-                )
-              ],
+      body: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          if (details.delta.distance > 5) {
+            if (details.delta.dx < 0) {
+              widget.updatePage(2);
+            } else if (details.delta.dx > 0) {
+              widget.updatePage(0);
+            }
+          }
+        },
+        child: Stack(
+          children: [
+            Container(
+              color: darkmode ? Colors.transparent : AppStyles.primaryColor(darkmode).withOpacity(0.2)
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top:25.0, bottom: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox( // holds the pedometer step count
+                    width: double.infinity,
+                    height: 150.0,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 150.0,
+                          height: 150.0,
+                          decoration: BoxDecoration(
+                            color: AppStyles.secondaryColor(darkmode),
+                            borderRadius: BorderRadius.circular(100.0),
+                            border: Border.all(
+                              width: 4,
+                              color: AppStyles.secondaryColor(!darkmode).withOpacity(0.25)
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: const Offset(0, 3),
+                                color: Colors.black.withOpacity(0.05)
+                              ),
+                              BoxShadow(
+                                blurRadius: 1,
+                                offset: const Offset(0, 1),
+                                color: Colors.black.withOpacity(0.1)
+                              )
+                            ]
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _stepCount,
+                              style: TextStyle(
+                                fontFamily: 'Geologica',
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: AppStyles.textColor(darkmode)
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              "steps",
+                              style: TextStyle(
+                                fontFamily: 'Geologica',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppStyles.textColor(darkmode).withOpacity(0.6)
+                              ),
+                              textAlign: TextAlign.center,
+                            )
+                          ],
+                        )
+                        
+                      ],
+                    ),
+                  ),
+            
+                  SizedBox(
+                    height: 50.0,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        routineData.isNotEmpty ? IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              refresh = true;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.refresh,
+                            color: AppStyles.accentColor(darkmode),
+                            size: 24,
+                          ),
+                        ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
+                      ],
+                    )
+                  ),
+            
+                  Expanded( // holds this scrollable listview of routines
+                    child: ListView.separated(
+                      itemBuilder: (context, index) {
+                        return routineTile(routineNames[index], routineData.where((element) => element['routineName'] == routineNames[index]).toList());
+                      },
+                      separatorBuilder: (context, index) => const Divider(color: Colors.transparent),
+                      itemCount: routineNames.length,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
       )
     );
   }

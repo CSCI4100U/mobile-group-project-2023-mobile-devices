@@ -9,7 +9,6 @@ import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/workou
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'page_bodies/home_body.dart';
 import 'page_bodies/stats_body.dart';
 import 'page_bodies/account_body.dart';
@@ -25,13 +24,30 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   int currentIndex = 1; // the currently selected page (default is home page)
+  final PageController _pageController = PageController(initialPage: 1);
   late Map pages;
   bool darkmode = false;
+
+  void switchToPage(int index) {
+    setState(() {
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut
+      );
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    pages = {0:StatsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
+    pages = {0:StatsBody(switchToPage), 1:HomeBody(switchToPage), 2:AccountBody(switchToPage)}; // the mapping of our pages for the navbar
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,6 +90,12 @@ class HomePageState extends State<HomePage> {
         onTap: (value) {
           setState(() {
             currentIndex = value;
+
+            _pageController.animateToPage(
+              value,
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeOut
+            );
           });
         },
       ),
@@ -98,8 +120,21 @@ class HomePageState extends State<HomePage> {
         */
       ) : null,
 
-      body: pages[currentIndex], // this allows the body to change on setState() call
-      
+      //body: pages[currentIndex], // this allows the body to change on setState() call
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => currentIndex = index);
+          },
+          children: [
+            pages[0],
+            pages[1],
+            pages[2]
+          ]
+        )
+      )
+
     );
   }
 }

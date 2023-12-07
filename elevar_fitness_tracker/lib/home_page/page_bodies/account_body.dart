@@ -11,7 +11,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class AccountBody extends StatefulWidget {
-  const AccountBody({super.key});
+  Function updatePage;
+  AccountBody(this.updatePage, {super.key});
 
   @override
   State<AccountBody> createState() => _AccountBodyState();
@@ -346,333 +347,342 @@ class _AccountBodyState extends State<AccountBody> {
         ],
         backgroundColor: AppStyles.primaryColor(isDarkMode).withOpacity(isDarkMode ? 0.5 : 1.0)
       ),
-      body: Stack(
-        children: [
-          Container(
-            // When in light mode, we want the background to be slightly darker than foreground
-            // elements, so we overlay a bit of the primary color over the white background.
-            // However, applying the same logic in dark mode would result in a slightly tinted
-            // background with black foreground elements, which is the opposite of what we want.
-            // Therefore, we flip the colouring logic of this background and of the foreground
-            // elements based on if we're in dark mode or not. You'll see this throughout this
-            // doc, the next comment block down is an example of foreground elements.
-            color: isDarkMode ? Colors.transparent : AppStyles.primaryColor(isDarkMode).withOpacity(0.2)
-          ),
-          FutureBuilder(
-            future: SharedPreferences.getInstance(),
-            builder: (BuildContext context0, AsyncSnapshot<SharedPreferences> snapshot0) {
-              if (snapshot0.connectionState == ConnectionState.done) {
-                return FutureBuilder(
-                  future: users.doc(username).get(),
-                  builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text("Something went wrong!",
-                        style: AppStyles.getSubHeadingStyle(darkmode))
-                      );
-                    }
-
-                    if (snapshot.hasData && !snapshot.data!.exists) {
-                      return Center(
-                        child: Text(
-                          "Could not fetch data for '$username'!",
-                          style: AppStyles.getSubHeadingStyle(darkmode)
-                        )
-                      );
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                // Here! Is where we handle the colouring of foreground elements
-                                // depending on if we're in light or dark mode. See comment above
-                                // for context.
-                                // This happens a few more times throughout this doc (for every
-                                // user information container we have), so I will not comment on it
-                                // past this point, but keep it in mind.
-                                color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
-                                boxShadow: [
-                                  // One softer, blurrier shadow combined with a sharper
-                                  // shadow to create a sense of layering. Idea shamelessly
-                                  // taken from Microsoft's Fluent 2 design docs.
-                                  BoxShadow(
-                                    spreadRadius: 2,
-                                    blurRadius: 7,
-                                    offset: const Offset(0, 3),
-                                    color: Colors.black.withOpacity(0.1)
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 1,
-                                    offset: const Offset(0, 1),
-                                    color: Colors.black.withOpacity(0.1)
-                                  )
-                                ]
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Container(
-                                        margin: AppStyles.getDefaultInsets(),
-                                        child: CircleAvatar(
-                                          backgroundColor: AppStyles.secondaryColor(isDarkMode),
-                                          minRadius: 60,
-                                          child: Text(
-                                            "${data['first_name'][0]}${data['last_name'][0]}",
-                                            style: TextStyle(
-                                              fontFamily: 'Geologica',
-                                              fontSize: 48,
-                                              fontWeight: FontWeight.w800,
-                                              color: AppStyles.textColor(isDarkMode).withOpacity(0.5),
+      body: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          if (details.delta.distance > 5) {
+            if (details.delta.dx > 0) {
+              widget.updatePage(1);
+            }
+          }
+        },
+        child: Stack(
+          children: [
+            Container(
+              // When in light mode, we want the background to be slightly darker than foreground
+              // elements, so we overlay a bit of the primary color over the white background.
+              // However, applying the same logic in dark mode would result in a slightly tinted
+              // background with black foreground elements, which is the opposite of what we want.
+              // Therefore, we flip the colouring logic of this background and of the foreground
+              // elements based on if we're in dark mode or not. You'll see this throughout this
+              // doc, the next comment block down is an example of foreground elements.
+              color: isDarkMode ? Colors.transparent : AppStyles.primaryColor(isDarkMode).withOpacity(0.2)
+            ),
+            FutureBuilder(
+              future: SharedPreferences.getInstance(),
+              builder: (BuildContext context0, AsyncSnapshot<SharedPreferences> snapshot0) {
+                if (snapshot0.connectionState == ConnectionState.done) {
+                  return FutureBuilder(
+                    future: users.doc(username).get(),
+                    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text("Something went wrong!",
+                          style: AppStyles.getSubHeadingStyle(darkmode))
+                        );
+                      }
+        
+                      if (snapshot.hasData && !snapshot.data!.exists) {
+                        return Center(
+                          child: Text(
+                            "Could not fetch data for '$username'!",
+                            style: AppStyles.getSubHeadingStyle(darkmode)
+                          )
+                        );
+                      }
+        
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+        
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                  // Here! Is where we handle the colouring of foreground elements
+                                  // depending on if we're in light or dark mode. See comment above
+                                  // for context.
+                                  // This happens a few more times throughout this doc (for every
+                                  // user information container we have), so I will not comment on it
+                                  // past this point, but keep it in mind.
+                                  color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
+                                  boxShadow: [
+                                    // One softer, blurrier shadow combined with a sharper
+                                    // shadow to create a sense of layering. Idea shamelessly
+                                    // taken from Microsoft's Fluent 2 design docs.
+                                    BoxShadow(
+                                      spreadRadius: 2,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                      color: Colors.black.withOpacity(0.1)
+                                    ),
+                                    BoxShadow(
+                                      blurRadius: 1,
+                                      offset: const Offset(0, 1),
+                                      color: Colors.black.withOpacity(0.1)
+                                    )
+                                  ]
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Container(
+                                          margin: AppStyles.getDefaultInsets(),
+                                          child: CircleAvatar(
+                                            backgroundColor: AppStyles.secondaryColor(isDarkMode),
+                                            minRadius: 60,
+                                            child: Text(
+                                              "${data['first_name'][0]}${data['last_name'][0]}",
+                                              style: TextStyle(
+                                                fontFamily: 'Geologica',
+                                                fontSize: 48,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppStyles.textColor(isDarkMode).withOpacity(0.5),
+                                              )
+                                            )
+                                          )
+                                        ),
+                                        Expanded(
+                                          child: Container(
+                                            margin: const EdgeInsets.all(5),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${data['first_name']} ${data['last_name']}",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Geologica',
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: AppStyles.textColor(isDarkMode),
+                                                  )
+                                                ),
+                                                Text(
+                                                  "@$username",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Geologica',
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppStyles.accentColor(isDarkMode),
+                                                  )
+                                                )
+                                              ],
                                             )
                                           )
                                         )
-                                      ),
-                                      Expanded(
-                                        child: Container(
-                                          margin: const EdgeInsets.all(5),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "${data['first_name']} ${data['last_name']}",
-                                                style: TextStyle(
-                                                  fontFamily: 'Geologica',
-                                                  fontSize: 24,
-                                                  fontWeight: FontWeight.w800,
-                                                  color: AppStyles.textColor(isDarkMode),
-                                                )
-                                              ),
-                                              Text(
-                                                "@$username",
-                                                style: TextStyle(
-                                                  fontFamily: 'Geologica',
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppStyles.accentColor(isDarkMode),
-                                                )
-                                              )
-                                            ],
-                                          )
+                                      ]
+                                    ),
+                                    Divider(
+                                      indent: 20,
+                                      endIndent: 20,
+                                      color: AppStyles.textColor(isDarkMode).withOpacity(0.25)
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                                      child: Text(
+                                        "User Info",
+                                        style: TextStyle(
+                                          fontFamily: 'Geologica',
+                                          fontWeight: FontWeight.w800,
+                                          color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
                                         )
                                       )
-                                    ]
-                                  ),
-                                  Divider(
-                                    indent: 20,
-                                    endIndent: 20,
-                                    color: AppStyles.textColor(isDarkMode).withOpacity(0.25)
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                                    child: Text(
-                                      "User Info",
-                                      style: TextStyle(
-                                        fontFamily: 'Geologica',
-                                        fontWeight: FontWeight.w800,
-                                        color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
-                                      )
+                                    ),
+                                    ListView(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      children: [
+                                        AccountPageEntry(
+                                          prefs: prefs,
+                                          entryName: "Name",
+                                          icon: CupertinoIcons.person_solid,
+                                          text: "${data['first_name']} ${data['last_name']}",
+                                          onPress: () {
+                                            editNameDialog(context, username, data, firstNameController, lastNameController);
+                                          }
+                                        ),
+                                        AccountPageEntry(
+                                          prefs: prefs,
+                                          entryName: "Birthdate",
+                                          icon: CupertinoIcons.calendar,
+                                          text: AccountBody.formatTimestamp((data['birthdate'] as Timestamp).toDate(), asText: true),
+                                          onPress: () {
+                                            editBirthdateDialog(context, username, data);
+                                          }
+                                        ),
+                                      ]
                                     )
-                                  ),
-                                  ListView(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    children: [
-                                      AccountPageEntry(
-                                        prefs: prefs,
-                                        entryName: "Name",
-                                        icon: CupertinoIcons.person_solid,
-                                        text: "${data['first_name']} ${data['last_name']}",
-                                        onPress: () {
-                                          editNameDialog(context, username, data, firstNameController, lastNameController);
-                                        }
-                                      ),
-                                      AccountPageEntry(
-                                        prefs: prefs,
-                                        entryName: "Birthdate",
-                                        icon: CupertinoIcons.calendar,
-                                        text: AccountBody.formatTimestamp((data['birthdate'] as Timestamp).toDate(), asText: true),
-                                        onPress: () {
-                                          editBirthdateDialog(context, username, data);
-                                        }
-                                      ),
-                                    ]
-                                  )
-                                ]
+                                  ]
+                                )
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                  color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      spreadRadius: 1,
+                                      blurRadius: 3,
+                                      offset: const Offset(0, 3),
+                                      color: Colors.black.withOpacity(0.05)
+                                    ),
+                                    BoxShadow(
+                                      blurRadius: 1,
+                                      offset: const Offset(0, 1),
+                                      color: Colors.black.withOpacity(0.1)
+                                    )
+                                  ]
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                                      child: Text(
+                                        "Account Info",
+                                        style: TextStyle(
+                                          fontFamily: 'Geologica',
+                                          fontWeight: FontWeight.w800,
+                                          color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
+                                        )
+                                      )
+                                    ),
+                                    ListView(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      children: [
+                                        AccountPageEntry(
+                                          prefs: prefs,
+                                          entryName: "E-mail",
+                                          icon: CupertinoIcons.mail_solid,
+                                          text: "${data['email']}",
+                                          onPress: () {
+                                            editEmailDialog(context, username, data, emailController, emailConfirmController);
+                                          }
+                                        ),
+                                        AccountPageEntry(
+                                          prefs: prefs,
+                                          entryName: "Password",
+                                          icon: CupertinoIcons.lock_fill,
+                                          text: "${data['password']}",
+                                          onPress: () {
+                                            editPasswordDialog(context, username, data, currentPasswordController, newPasswordController, confirmPasswordController);
+                                          },
+                                          hideText: true
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                  color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      spreadRadius: 1,
+                                      blurRadius: 3,
+                                      offset: const Offset(0, 3),
+                                      color: Colors.black.withOpacity(0.05)
+                                    ),
+                                    BoxShadow(
+                                      blurRadius: 1,
+                                      offset: const Offset(0, 1),
+                                      color: Colors.black.withOpacity(0.1)
+                                    )
+                                  ]
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 20.0, top: 10.0),
+                                      child: Text(
+                                        "Settings",
+                                        style: TextStyle(
+                                          fontFamily: 'Geologica',
+                                          fontWeight: FontWeight.w800,
+                                          color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
+                                        )
+                                      )
+                                    ),
+                                    ListView(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      children: [
+                                        DarkModeToggleEntry(prefs: prefs, refreshParent: refresh)
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              )
+                            ]
+                          ),
+                        );
+                      }
+        
+                      // While we haven't finished loading the user information from
+                      // the cloud, display a simple loading screen.
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Loading @$username's Info",
+                              style: TextStyle(
+                                fontFamily: 'Geologica',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: AppStyles.accentColor(isDarkMode)
                               )
                             ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
-                                boxShadow: [
-                                  BoxShadow(
-                                    spreadRadius: 1,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 3),
-                                    color: Colors.black.withOpacity(0.05)
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 1,
-                                    offset: const Offset(0, 1),
-                                    color: Colors.black.withOpacity(0.1)
-                                  )
-                                ]
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                                    child: Text(
-                                      "Account Info",
-                                      style: TextStyle(
-                                        fontFamily: 'Geologica',
-                                        fontWeight: FontWeight.w800,
-                                        color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
-                                      )
-                                    )
-                                  ),
-                                  ListView(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    children: [
-                                      AccountPageEntry(
-                                        prefs: prefs,
-                                        entryName: "E-mail",
-                                        icon: CupertinoIcons.mail_solid,
-                                        text: "${data['email']}",
-                                        onPress: () {
-                                          editEmailDialog(context, username, data, emailController, emailConfirmController);
-                                        }
-                                      ),
-                                      AccountPageEntry(
-                                        prefs: prefs,
-                                        entryName: "Password",
-                                        icon: CupertinoIcons.lock_fill,
-                                        text: "${data['password']}",
-                                        onPress: () {
-                                          editPasswordDialog(context, username, data, currentPasswordController, newPasswordController, confirmPasswordController);
-                                        },
-                                        hideText: true
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              )
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                                color: isDarkMode ? AppStyles.primaryColor(isDarkMode).withOpacity(0.2) : AppStyles.backgroundColor(isDarkMode),
-                                boxShadow: [
-                                  BoxShadow(
-                                    spreadRadius: 1,
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 3),
-                                    color: Colors.black.withOpacity(0.05)
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: 1,
-                                    offset: const Offset(0, 1),
-                                    color: Colors.black.withOpacity(0.1)
-                                  )
-                                ]
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 20.0, top: 10.0),
-                                    child: Text(
-                                      "Settings",
-                                      style: TextStyle(
-                                        fontFamily: 'Geologica',
-                                        fontWeight: FontWeight.w800,
-                                        color: AppStyles.accentColor(isDarkMode).withOpacity(0.5),
-                                      )
-                                    )
-                                  ),
-                                  ListView(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    children: [
-                                      DarkModeToggleEntry(prefs: prefs, refreshParent: refresh)
-                                    ],
-                                  ),
-                                ],
-                              )
+                            const SizedBox(height: 10),
+                            LoadingAnimationWidget.threeArchedCircle(
+                              color: AppStyles.accentColor(isDarkMode),
+                              size: 50,
                             )
-                          ]
-                        ),
+                          ],
+                        )
                       );
                     }
-
-                    // While we haven't finished loading the user information from
-                    // the cloud, display a simple loading screen.
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Loading @$username's Info",
-                            style: TextStyle(
-                              fontFamily: 'Geologica',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w800,
-                              color: AppStyles.accentColor(isDarkMode)
-                            )
-                          ),
-                          const SizedBox(height: 10),
-                          LoadingAnimationWidget.threeArchedCircle(
-                            color: AppStyles.accentColor(isDarkMode),
-                            size: 50,
-                          )
-                        ],
+                  );
+                }
+        
+                // While we aren't sure of the current status from the cloud,
+                // display a simple loading screen.
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Connecting...",
+                        style: TextStyle(
+                          fontFamily: 'Geologica',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: AppStyles.accentColor(isDarkMode)
+                        )
+                      ),
+                      const SizedBox(height: 10),
+                      LoadingAnimationWidget.threeArchedCircle(
+                        color: AppStyles.accentColor(isDarkMode),
+                        size: 50,
                       )
-                    );
-                  }
+                    ],
+                  )
                 );
               }
-
-              // While we aren't sure of the current status from the cloud,
-              // display a simple loading screen.
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Connecting...",
-                      style: TextStyle(
-                        fontFamily: 'Geologica',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: AppStyles.accentColor(isDarkMode)
-                      )
-                    ),
-                    const SizedBox(height: 10),
-                    LoadingAnimationWidget.threeArchedCircle(
-                      color: AppStyles.accentColor(isDarkMode),
-                      size: 50,
-                    )
-                  ],
-                )
-              );
-            }
-          ),
-        ],
+            ),
+          ],
+        ),
       )
     );
   }
