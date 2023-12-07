@@ -1,5 +1,6 @@
 import 'package:elevar_fitness_tracker/components/rounded_button.dart';
 import 'package:elevar_fitness_tracker/components/rounded_input_field.dart';
+import 'package:elevar_fitness_tracker/home_page/homepage.dart';
 import 'package:elevar_fitness_tracker/login_signup_page/account_info_body.dart';
 import 'package:elevar_fitness_tracker/login_signup_page/login_signup_page.dart';
 import 'package:flutter/material.dart';
@@ -102,123 +103,132 @@ class SignupBodyState extends State<SignupBody> {
     // wasted half a day of my life, so it will just jump up and down. :thumbsup:
     double offset = MediaQuery.of(context).viewInsets.bottom > 0 ? 5.2 : 3.65;
     
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: AppStyles.backgroundColor(isDarkMode),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            // We use the offset variable from above here to move everything up and down
-            padding: EdgeInsets.only(left: 20, top: size.height / offset, bottom: 10),
-            child: Text(
-              "Sign Up",
-              style: TextStyle(
-                fontFamily: 'Geologica',
-                fontSize: 48,
-                fontWeight: FontWeight.w800,
-                color: AppStyles.textColor(isDarkMode)
-              )
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.distance > 5) {
+          if (details.delta.dx > 0) {
+            Navigator.pushReplacement(
+              context,
+              LoginSignupPage.createSlidingRoute(const LoginSignupPage(), false),
+            );
+          }
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: AppStyles.backgroundColor(isDarkMode),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              // We use the offset variable from above here to move everything up and down
+              padding: EdgeInsets.only(left: 20, top: size.height / offset, bottom: 10),
+              child: Text(
+                "Sign Up",
+                style: TextStyle(
+                  fontFamily: 'Geologica',
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  color: AppStyles.textColor(isDarkMode)
+                )
+              ),
             ),
-          ),
-          ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.zero,
-            children: [
-              RoundedInputField(
-                hintText: "Username",
-                controller: usernameController,
-                icon: CupertinoIcons.person_crop_circle_fill,
-                onChanged: (value) {},
-                errorText: usernameError,
-                prefs: widget.prefs
-              ),
-              RoundedInputField(
-                hintText: "E-mail",
-                controller: emailController,
-                icon: CupertinoIcons.mail_solid,
-                onChanged: (value) {},
-                errorText: emailError,
-                prefs: widget.prefs
-              ),
-              RoundedInputField(
-                hintText: "Password",
-                controller: passwordController,
-                icon: CupertinoIcons.lock_fill,
-                onChanged: (value) {},
-                errorText: passwordError,
-                prefs: widget.prefs,
-                hidden: hidePassword,
-                updateHiddenFn: flipHidePassword,
-              ),
-              RoundedButton("Continue", () {
-                trySignup().then((result) {
-                  // If the trySignup method returned success, then navigate to the
-                  // account info page (while passing along the information entered
-                  // on this page).
-                  // If not, handle accordingly.
-                  switch (result) {
-                    case SignupResult.success:
-                      setState(() {
-                        usernameError = null;
-                        emailError = null;
-                        passwordError = null;
-                      });
-
-                      Navigator.pushReplacement(
-                        context,
-                        LoginSignupPage.createSlidingRoute(AccountInfoBody(
-                          usernameController.text,
-                          emailController.text,
-                          passwordController.text,
-                          widget.prefs), true),
-                      );
-                    case SignupResult.emptyUsername:
-                      setState(() {
-                        usernameError = "Username cannot be empty";
-                        emailError = null;
-                        passwordError = null;
-                      });
-                    case SignupResult.emptyEmail:
-                      setState(() {
-                        usernameError = null;
-                        emailError = "E-mail cannot be empty";
-                        passwordError = null;
-                      });
-                    case SignupResult.emptyPassword:
-                      setState(() {
-                        usernameError = null;
-                        emailError = null;
-                        passwordError = "Password cannot be empty";
-                      });
-                    case SignupResult.usernameExists:
-                      setState(() {
-                        usernameError = "Username already exists";
-                        emailError = null;
-                        passwordError = null;
-                      });
-                    default:
-                      setState(() {
-                        usernameError = null;
-                        emailError = null;
-                        passwordError = null;
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Error occured while signing up."),)
-                      );
-                  }
-                });
-              }, widget.prefs),
-            ],
-          ),
-          const Spacer(),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 40),
+            ListView(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              children: [
+                RoundedInputField(
+                  hintText: "Username",
+                  controller: usernameController,
+                  icon: CupertinoIcons.person_crop_circle_fill,
+                  onChanged: (value) {},
+                  errorText: usernameError,
+                  prefs: widget.prefs
+                ),
+                RoundedInputField(
+                  hintText: "E-mail",
+                  controller: emailController,
+                  icon: CupertinoIcons.mail_solid,
+                  onChanged: (value) {},
+                  errorText: emailError,
+                  prefs: widget.prefs
+                ),
+                RoundedInputField(
+                  hintText: "Password",
+                  controller: passwordController,
+                  icon: CupertinoIcons.lock_fill,
+                  onChanged: (value) {},
+                  errorText: passwordError,
+                  prefs: widget.prefs,
+                  hidden: hidePassword,
+                  updateHiddenFn: flipHidePassword,
+                ),
+                RoundedButton("Continue", () {
+                  trySignup().then((result) {
+                    // If the trySignup method returned success, then navigate to the
+                    // account info page (while passing along the information entered
+                    // on this page).
+                    // If not, handle accordingly.
+                    switch (result) {
+                      case SignupResult.success:
+                        setState(() {
+                          usernameError = null;
+                          emailError = null;
+                          passwordError = null;
+                        });
+      
+                        Navigator.pushReplacement(
+                          context,
+                          LoginSignupPage.createSlidingRoute(AccountInfoBody(
+                            usernameController.text,
+                            emailController.text,
+                            passwordController.text,
+                            widget.prefs), true),
+                        );
+                      case SignupResult.emptyUsername:
+                        setState(() {
+                          usernameError = "Username cannot be empty";
+                          emailError = null;
+                          passwordError = null;
+                        });
+                      case SignupResult.emptyEmail:
+                        setState(() {
+                          usernameError = null;
+                          emailError = "E-mail cannot be empty";
+                          passwordError = null;
+                        });
+                      case SignupResult.emptyPassword:
+                        setState(() {
+                          usernameError = null;
+                          emailError = null;
+                          passwordError = "Password cannot be empty";
+                        });
+                      case SignupResult.usernameExists:
+                        setState(() {
+                          usernameError = "Username already exists";
+                          emailError = null;
+                          passwordError = null;
+                        });
+                      default:
+                        setState(() {
+                          usernameError = null;
+                          emailError = null;
+                          passwordError = null;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Error occured while signing up."),)
+                        );
+                    }
+                  });
+                }, widget.prefs),
+                Container(
+              margin: const EdgeInsets.only(bottom: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Already have an account? ",
+                    "or ",
                     style: TextStyle(
                       fontFamily: 'Geologica',
                       fontSize: 14,
@@ -227,26 +237,66 @@ class SignupBodyState extends State<SignupBody> {
                   ),
                   GestureDetector(
                     onTap: () {
+                      widget.prefs?.setString('username', '');
+                      widget.prefs?.setString('password', '');
+        
                       Navigator.pushReplacement(
                         context,
-                        LoginSignupPage.createSlidingRoute(const LoginSignupPage(), false),
+                        MaterialPageRoute(builder: (context) => const HomePage()),
                       );
                     },
                     child: Text(
-                      "Log In",
+                      "continue as guest",
                       style: TextStyle(
                         fontFamily: 'Geologica',
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: AppStyles.accentColor(isDarkMode)
+                        color: AppStyles.primaryColor(!isDarkMode).withOpacity(0.5)
                       )
                     )
                   )
                 ],
               ),
-            )
-        ],
-      )
+            ),
+              ],
+            ),
+            const Spacer(),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      style: TextStyle(
+                        fontFamily: 'Geologica',
+                        fontSize: 14,
+                        color: AppStyles.accentColor(isDarkMode).withOpacity(0.5)
+                      )
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          LoginSignupPage.createSlidingRoute(const LoginSignupPage(), false),
+                        );
+                      },
+                      child: Text(
+                        "Log In",
+                        style: TextStyle(
+                          fontFamily: 'Geologica',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppStyles.accentColor(isDarkMode)
+                        )
+                      )
+                    )
+                  ],
+                ),
+              )
+          ],
+        )
+      ),
     );
   }
 }
