@@ -207,11 +207,11 @@ class _HomeBodyState extends State<HomeBody> {
                           width: 150.0,
                           height: 150.0,
                           decoration: BoxDecoration(
-                            color: AppStyles.secondaryColor(darkmode),
+                            color: darkmode ? AppStyles.primaryColor(!darkmode).withOpacity(0.2) : AppStyles.backgroundColor(darkmode),
                             borderRadius: BorderRadius.circular(100.0),
                             border: Border.all(
-                              width: 4,
-                              color: AppStyles.secondaryColor(!darkmode).withOpacity(0.25)
+                              width: 8,
+                              color: AppStyles.secondaryColor(darkmode).withOpacity(0.25)
                             ),
                             boxShadow: [
                               BoxShadow(
