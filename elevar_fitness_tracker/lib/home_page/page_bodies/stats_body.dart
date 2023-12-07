@@ -17,7 +17,7 @@ class statsBody extends StatelessWidget {
         backgroundColor: AppStyles.primaryColor(darkmode),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: dbModel.getMaxStatsForEachExerciseInRoutines(),
+        future: dbModel.getUniqueWorkoutStats(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

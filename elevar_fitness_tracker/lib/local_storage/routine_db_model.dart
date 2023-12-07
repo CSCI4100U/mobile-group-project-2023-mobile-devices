@@ -41,19 +41,16 @@ class RoutineDBModel {
     return result.length;
   }
 
-  Future<List<Map<String, dynamic>>>
-      getMaxStatsForEachExerciseInRoutines() async {
+  Future<List<Map<String, dynamic>>> getUniqueWorkoutStats() async {
     final Database db = await DBUtils.init();
 
     List<Map<String, dynamic>> result = await db.rawQuery('''
       SELECT 
-        routineName,
         exerciseName,
-        MAX(heavySetReps) as maxReps,
-        MAX(weight) as maxWeight
+        MAX(COALESCE(heavySetReps, 0)) as maxReps,
+        MAX(COALESCE(weight, 0)) as maxWeight
       FROM Routines
-      GROUP BY routineName, exerciseName
-      ORDER BY routineName, exerciseName
+      GROUP BY exerciseName
     ''');
 
     return result;
