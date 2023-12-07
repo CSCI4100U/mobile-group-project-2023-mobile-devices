@@ -70,11 +70,12 @@ class AccountPageEntryState extends State<AccountPageEntry> {
 
 class DarkModeToggleEntry extends StatefulWidget {
   const DarkModeToggleEntry({
-    required this.prefs, required this.refreshParent, super.key
+    required this.prefs, required this.refreshParent, required this.stateCallBack, super.key
   });
   
   final SharedPreferences? prefs;
   final Function() refreshParent;
+  final Function stateCallBack;
   
   @override
   State<DarkModeToggleEntry> createState() => DarkModeToggleEntryState();
@@ -107,6 +108,7 @@ class DarkModeToggleEntryState extends State<DarkModeToggleEntry> {
           activeColor: AppStyles.primaryColor(isDarkMode),
           onChanged: (bool value) {
             widget.prefs?.setBool('darkmode', !isDarkMode);
+            widget.stateCallBack(!isDarkMode);
             //setState(() {});
             widget.refreshParent();
           },

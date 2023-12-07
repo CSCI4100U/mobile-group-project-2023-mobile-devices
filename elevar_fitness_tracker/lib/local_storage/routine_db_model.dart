@@ -32,6 +32,18 @@ class RoutineDBModel {
     return id;
   }
 
+  Future<int> deleteRoutine(String routineName) async {
+    final Database db = await DBUtils.init();
+
+    final int id = await db.delete(
+      'Routines', 
+      where: "routineName = ?",
+      whereArgs: [routineName]
+    );
+
+    return id;
+  }
+
   Future<int> getNumDistinctRoutines() async {
     final Database db = await DBUtils.init();
 

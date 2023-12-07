@@ -5,13 +5,14 @@
   - However, we will later implement routes for adding a workout, taking you to the registration page,
   and potentially more involving the stats page
 */
-import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/workout_body.dart';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:flutter/cupertino.dart';
 import 'page_bodies/home_body.dart';
 import 'page_bodies/stats_body.dart';
 import 'page_bodies/account_body.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,7 +25,13 @@ class HomePageState extends State<HomePage> {
   int currentIndex = 1; // the currently selected page (default is home page)
   final PageController _pageController = PageController(initialPage: 1);
   late Map pages;
+  SharedPreferences? prefs;
   bool darkmode = false;
+
+  // defining page variables:
+  late StatsBody statsBody;
+  late HomeBody homeBody;
+  late AccountBody accountBody;
 
   void switchToPage(int index) {
     setState(() {
@@ -36,10 +43,33 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+  void handleDarkMode(bool darkMode) {
+    setState(() {
+      darkmode = darkMode;
+    });
+  }
+
+  void refreshPage() {
+    setState(() {
+
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    pages = {0:StatsBody(switchToPage), 1:HomeBody(switchToPage), 2:AccountBody(switchToPage)}; // the mapping of our pages for the navbar
+    statsBody = StatsBody(switchToPage);
+    homeBody = HomeBody(switchToPage);
+    accountBody = AccountBody(switchToPage, handleDarkMode);
+
+    pages = {0:statsBody, 1:homeBody, 2:accountBody}; // the mapping of our pages for the navbar
+
+    SharedPreferences.getInstance().then((sharedPrefs) {
+      setState(() {
+        prefs = sharedPrefs;
+        darkmode = prefs?.getBool('darkmode') ?? false;
+      });
+    });
   }
 
   @override
@@ -97,26 +127,6 @@ class HomePageState extends State<HomePage> {
           });
         },
       ),
-
-      floatingActionButton: currentIndex == 1? FloatingActionButton(
-        // later somehow change the icon to a dumbell or something similar
-        onPressed: () async {
-          Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const WorkoutPage()),
-          );
-        },
-        backgroundColor: AppStyles.backgroundColor(darkmode),
-        focusColor: AppStyles.highlightColor(darkmode),
-        tooltip: "Create a new workout",
-        child: Icon(Icons.add, size: 24, color: AppStyles.textColor(darkmode)),
-        /*
-        const ImageIcon(
-          AssetImage('lib/img/dumbell.png'),
-          size: 24.0
-        )
-        */
-      ) : null,
 
       //body: pages[currentIndex], // this allows the body to change on setState() call
       body: SizedBox.expand(

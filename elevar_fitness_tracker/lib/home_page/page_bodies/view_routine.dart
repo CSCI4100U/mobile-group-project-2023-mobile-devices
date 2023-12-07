@@ -4,8 +4,9 @@ import 'package:elevar_fitness_tracker/local_storage/routine_db_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RoutineView extends StatefulWidget {
-  RoutineView(this.routineTitle);
+  RoutineView(this.routineTitle, this.stateCallBack);
 
+  final Function stateCallBack;
   final String routineTitle;
   
   @override
@@ -54,6 +55,16 @@ class RoutineViewState extends State<RoutineView> {
           style: AppStyles.getHeadingStyle(darkmode),
         ),
         backgroundColor: AppStyles.primaryColor(darkmode),
+        actions: [
+          IconButton(
+            onPressed: () {
+              database.deleteRoutine(widget.routineTitle);
+              widget.stateCallBack(true);
+              Navigator.of(context).pop();
+            }, 
+            icon: Icon(Icons.delete, color: AppStyles.textColor(darkmode), size: 24,)
+          )
+        ],
       ),
       body: Container(
         width: double.infinity,

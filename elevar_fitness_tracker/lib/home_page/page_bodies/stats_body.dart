@@ -6,7 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StatsBody extends StatefulWidget {
   Function updatePage;
-  StatsBody(this.updatePage,);
+  
+  StatsBody(this.updatePage, {super.key});
   @override
   State<StatsBody> createState() => StatsBodyState();
 }
@@ -118,7 +119,7 @@ class StatsBodyState extends State<StatsBody> {
                     ),
                   );
                 } else {
-                  return const Center(child: Text('No exercise stats available'));
+                  return Center(child: Text('No exercise stats available', style: AppStyles.getSubHeadingStyle(darkmode),));
                 }
               },
             ),

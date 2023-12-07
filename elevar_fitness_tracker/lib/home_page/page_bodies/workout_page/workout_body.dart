@@ -6,8 +6,9 @@ import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/Exerci
 import 'package:elevar_fitness_tracker/local_storage/routine_db_model.dart';
 
 class WorkoutPage extends StatefulWidget {
-  const WorkoutPage({super.key});
+  const WorkoutPage(this.stateCallBack, {super.key});
 
+  final Function stateCallBack;
   @override
   WorkoutPageState createState() => WorkoutPageState();
 }
@@ -140,6 +141,8 @@ class WorkoutPageState extends State<WorkoutPage> {
     child: ReorderableDelayedDragStartListener(
       index: index,
       child: Card(
+        color: darkmode ? AppStyles.primaryColor(darkmode).withOpacity(0.2)
+        : AppStyles.backgroundColor(darkmode),
         margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
         child: Column(
           children: [
@@ -305,7 +308,7 @@ class WorkoutPageState extends State<WorkoutPage> {
     selectedExercises.forEach((routineExercise) async {
       await database.insertExercise(routineExercise);
     });
-
+    widget.stateCallBack(true);
     Navigator.pop(context);
   }
 }

@@ -19,7 +19,8 @@ import 'package:image_picker/image_picker.dart';
 
 class AccountBody extends StatefulWidget {
   Function updatePage;
-  AccountBody(this.updatePage, {super.key});
+  Function stateCallBack;
+  AccountBody(this.updatePage, this.stateCallBack, {super.key});
 
   @override
   State<AccountBody> createState() => _AccountBodyState();
@@ -302,6 +303,7 @@ class _AccountBodyState extends State<AccountBody> {
   // For refreshing page when user toggles dark mode
   void refresh() {
     setState(() {});
+    //widget.stateCallBack(darkmode);
   }
 
   //Dialog for users to pick image source
@@ -902,7 +904,7 @@ class _AccountBodyState extends State<AccountBody> {
                                       scrollDirection: Axis.vertical,
                                       shrinkWrap: true,
                                       children: [
-                                        DarkModeToggleEntry(prefs: prefs, refreshParent: refresh)
+                                        DarkModeToggleEntry(prefs: prefs, refreshParent: refresh, stateCallBack: widget.stateCallBack),
                                       ],
                                     ),
                                   ],

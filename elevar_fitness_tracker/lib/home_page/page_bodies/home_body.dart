@@ -11,15 +11,18 @@ import 'package:elevar_fitness_tracker/notifications/notification_page.dart';
 import 'package:elevar_fitness_tracker/local_storage/routine_db_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'view_routine.dart';
+import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/workout_body.dart';
+
 
 class HomeBody extends StatefulWidget {
   Function updatePage;
+
   HomeBody(this.updatePage, {super.key});
   @override
-  State<HomeBody> createState() => _HomeBodyState();
+  State<HomeBody> createState() => HomeBodyState();
 }
 
-class _HomeBodyState extends State<HomeBody> {
+class HomeBodyState extends State<HomeBody> {
 
   // defining instance variables
   AppStyles styles = AppStyles();
@@ -46,7 +49,11 @@ class _HomeBodyState extends State<HomeBody> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool hasClicked = false;
 
-
+  void onStateCallBack(bool toRefresh) {
+    setState(() {
+      refresh = toRefresh;
+    });
+  }
 
   // Defining instance methods
   @override
@@ -58,6 +65,7 @@ class _HomeBodyState extends State<HomeBody> {
       setState(() {
         prefs = sharedPrefs;
         darkmode = prefs?.getBool('darkmode') ?? false;
+        //widget.stateCallBack(darkmode); // void call back to parent
       });
     });
   }
@@ -165,7 +173,16 @@ class _HomeBodyState extends State<HomeBody> {
       key: scaffoldKey,
       backgroundColor: AppStyles.backgroundColor(darkmode),
       appBar: AppBar(
-        title: Text("hello $firstName", style: AppStyles.getHeadingStyle(darkmode)),
+        title: Row(
+          children: [
+            Icon(
+              CupertinoIcons.home,
+              color: AppStyles.textColor(darkmode)
+            ),
+            const SizedBox(width: 10),
+              Text("Home", style: AppStyles.getHeadingStyle(darkmode)),
+            ],
+        ),
         backgroundColor: AppStyles.primaryColor(darkmode),
         actions: [
           ElevatedButton(
@@ -270,27 +287,28 @@ class _HomeBodyState extends State<HomeBody> {
                     ),
                   ),
             
-                  SizedBox(
-                    height: 50.0,
-                    width: double.infinity,
-                    child: Row(
-                      mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        routineData.isNotEmpty ? IconButton(
-                          onPressed: () async {
-                            setState(() {
-                              refresh = true;
-                            });
-                          },
-                          icon: Icon(
-                            Icons.refresh,
-                            color: AppStyles.accentColor(darkmode),
-                            size: 24,
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0),
+                    child: SizedBox(
+                      height: 50.0,
+                      width: double.infinity,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          routineData.isEmpty ? Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),)
+                          : Text(
+                            "Your Routines:", 
+                            style: TextStyle(
+                              fontFamily: 'Geologica',
+                              fontWeight: FontWeight.w500,
+                              color: AppStyles.textColor(darkmode),
+                              fontSize: 20.0,
+                            )
                           ),
-                        ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
-                      ],
-                    )
+                        ],
+                      )
+                    ),
                   ),
             
                   Expanded( // holds this scrollable listview of routines
@@ -305,41 +323,26 @@ class _HomeBodyState extends State<HomeBody> {
                 ],
               ),
             ),
-
-            SizedBox(
-              height: 50.0,
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      setState(() {
-                        refresh = true;
-                      });
-                    },
-                    icon: Icon(Icons.refresh, color: AppStyles.textColor(darkmode), size: 24,),
-                  )
-                ],
-              )
-            ),
-
-            routineData.isEmpty ? SizedBox(
-              height: 50.0,
-              child: Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),)
-            ) : Expanded( // holds this scrollable listview of routines
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return routineTile(routineNames[index], routineData.where((element) => element['routineName'] == routineNames[index]).toList());
-                },
-                separatorBuilder: (context, index) => const Divider(color: Colors.transparent),
-                itemCount: routineNames.length,
-              ),
-            ),
           ],
         ),
-      )
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => WorkoutPage(onStateCallBack)),
+          );
+        },
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+          side: BorderSide(color: AppStyles.backgroundColor(!darkmode), width: 2.0)
+        ),
+        backgroundColor: AppStyles.backgroundColor(darkmode),
+        focusColor: AppStyles.highlightColor(darkmode),
+        tooltip: "Create a new workout",
+        child: Icon(Icons.add, size: 24, color: AppStyles.textColor(darkmode)),
+      ),
     );
   }
 
@@ -374,7 +377,7 @@ class _HomeBodyState extends State<HomeBody> {
           onPressed: () {
             Navigator.push(
               context, 
-              MaterialPageRoute(builder:(context) => RoutineView(name),)
+              MaterialPageRoute(builder:(context) => RoutineView(name, onStateCallBack),)
             );
           },
           icon: Icon(
