@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:elevar_fitness_tracker/home_page/page_bodies/workout_page/Exercise_selection_page/exercise_data.dart';
 import 'package:elevar_fitness_tracker/http/http_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddExercise extends StatefulWidget {
   const AddExercise({super.key});
@@ -23,6 +24,20 @@ class AddExerciseState extends State<AddExercise> {
   List<ExerciseItem> exercises = [];
   List<ExerciseItem> selectedExercises = [];
   bool darkmode = false;
+
+  // Local prefs
+  SharedPreferences? prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((sharedPrefs) {
+      setState(() {
+        prefs = sharedPrefs;
+        darkmode = prefs?.getBool('darkmode') ?? false;
+      });
+    });
+  }
 
   final List<String> states = [
     'abdominals',
@@ -62,9 +77,14 @@ class AddExerciseState extends State<AddExercise> {
     }
 
     return Scaffold(
+      backgroundColor: AppStyles.backgroundColor(darkmode),
       appBar: AppBar(
         title: Text('Exercises', style: AppStyles.getHeadingStyle(darkmode)),
         backgroundColor: AppStyles.primaryColor(darkmode),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppStyles.textColor(darkmode)),
+          onPressed: () => Navigator.of(context).pop(),
+        )
       ),
       body: Column(
         children: [
@@ -74,6 +94,7 @@ class AddExerciseState extends State<AddExercise> {
             child: SizedBox(
                 width: double.infinity,
                 child: DropdownButtonFormField(
+                  dropdownColor: AppStyles.backgroundColor(darkmode),
                   value: null,
                   key: formkey,
                   items: states.map((String item) {

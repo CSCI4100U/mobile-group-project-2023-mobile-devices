@@ -73,124 +73,137 @@ class LoginBodyState extends State<LoginBody> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppStyles.backgroundColor(isDarkMode),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 20, top: size.height / 3.65, bottom: 10),
-            child: Text(
-              "Login",
-              style: TextStyle(
-                fontFamily: 'Geologica',
-                fontSize: 48,
-                fontWeight: FontWeight.w800,
-                color: AppStyles.textColor(isDarkMode)
-              )
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onHorizontalDragUpdate: (details) {
+          if (details.delta.distance > 5) {
+            if (details.delta.dx < 0) {
+              Navigator.pushReplacement(
+                context,
+                LoginSignupPage.createSlidingRoute(const LoginSignupPage(showSignup: true,), true),
+              );
+            }
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 20, top: size.height / 3.65, bottom: 10),
+              child: Text(
+                "Login",
+                style: TextStyle(
+                  fontFamily: 'Geologica',
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  color: AppStyles.textColor(isDarkMode)
+                )
+              ),
             ),
-          ),
-          RoundedInputField(
-            hintText: "Username",
-            controller: usernameController,
-            icon: CupertinoIcons.person_crop_circle_fill,
-            onChanged: (value) {},
-            errorText: usernameError,
-            prefs: widget.prefs
-          ),
-          RoundedInputField(
-            hintText: "Password",
-            controller: passwordController,
-            icon: CupertinoIcons.lock_fill,
-            onChanged: (value) {},
-            errorText: passwordError,
-            prefs: widget.prefs,
-            hidden: hidePassword,
-            updateHiddenFn: flipHidePassword,
-          ),
-          RoundedButton("Login", () {
-            tryLogin().then((result) {
-              // If the tryLogin method returned success, then store the username and
-              // password used to login in local storage and navigate to the home screen.
-              // If it returned any other value, handle it accordingly.
-              switch (result) {
-                case LoginResult.success:
-                  setState(() {
-                    usernameError = null;
-                    passwordError = null;
-                  });
-
-                  widget.prefs?.setString('username', usernameController.text);
-                  widget.prefs?.setString('password', passwordController.text);
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  );
-                case LoginResult.emptyUsername:
-                  setState(() {
-                    usernameError = "Username cannot be empty";
-                    passwordError = null;
-                  });
-                case LoginResult.emptyPassword:
-                  setState(() {
-                    usernameError = null;
-                    passwordError = "Password cannot be empty";
-                  });
-                case LoginResult.incorrectPassword:
-                  setState(() {
-                    usernameError = null;
-                    passwordError = "Incorrect password";
-                  });
-                case LoginResult.noAccount:
-                  setState(() {
-                    usernameError = "Username not found";
-                    passwordError = null;
-                  });
-                default:
-                  setState(() {
-                    usernameError = null;
-                    passwordError = null;
-                  });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Error occured while logging in."),)
-                  );
-              }
-            });
-          }, widget.prefs),
-          const Spacer(),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 40),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "Don't have an account? ",
-                  style: TextStyle(
-                    fontFamily: 'Geologica',
-                    fontSize: 14,
-                    color: AppStyles.accentColor(isDarkMode).withOpacity(0.5)
-                  )
-                ),
-                GestureDetector(
-                  onTap: () {
+            RoundedInputField(
+              hintText: "Username",
+              controller: usernameController,
+              icon: CupertinoIcons.person_crop_circle_fill,
+              onChanged: (value) {},
+              errorText: usernameError,
+              prefs: widget.prefs
+            ),
+            RoundedInputField(
+              hintText: "Password",
+              controller: passwordController,
+              icon: CupertinoIcons.lock_fill,
+              onChanged: (value) {},
+              errorText: passwordError,
+              prefs: widget.prefs,
+              hidden: hidePassword,
+              updateHiddenFn: flipHidePassword,
+            ),
+            RoundedButton("Login", () {
+              tryLogin().then((result) {
+                // If the tryLogin method returned success, then store the username and
+                // password used to login in local storage and navigate to the home screen.
+                // If it returned any other value, handle it accordingly.
+                switch (result) {
+                  case LoginResult.success:
+                    setState(() {
+                      usernameError = null;
+                      passwordError = null;
+                    });
+        
+                    widget.prefs?.setString('username', usernameController.text);
+                    widget.prefs?.setString('password', passwordController.text);
+        
                     Navigator.pushReplacement(
                       context,
-                      LoginSignupPage.createSlidingRoute(const LoginSignupPage(showSignup: true,), true),
+                      MaterialPageRoute(builder: (context) => const HomePage()),
                     );
-                  },
-                  child: Text(
-                    "Sign Up",
+                  case LoginResult.emptyUsername:
+                    setState(() {
+                      usernameError = "Username cannot be empty";
+                      passwordError = null;
+                    });
+                  case LoginResult.emptyPassword:
+                    setState(() {
+                      usernameError = null;
+                      passwordError = "Password cannot be empty";
+                    });
+                  case LoginResult.incorrectPassword:
+                    setState(() {
+                      usernameError = null;
+                      passwordError = "Incorrect password";
+                    });
+                  case LoginResult.noAccount:
+                    setState(() {
+                      usernameError = "Username not found";
+                      passwordError = null;
+                    });
+                  default:
+                    setState(() {
+                      usernameError = null;
+                      passwordError = null;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Error occured while logging in."),)
+                    );
+                }
+              });
+            }, widget.prefs),
+            const Spacer(),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 40),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
                     style: TextStyle(
                       fontFamily: 'Geologica',
                       fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: AppStyles.accentColor(isDarkMode)
+                      color: AppStyles.accentColor(isDarkMode).withOpacity(0.5)
+                    )
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        LoginSignupPage.createSlidingRoute(const LoginSignupPage(showSignup: true,), true),
+                      );
+                    },
+                    child: Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        fontFamily: 'Geologica',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppStyles.accentColor(isDarkMode)
+                      )
                     )
                   )
-                )
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

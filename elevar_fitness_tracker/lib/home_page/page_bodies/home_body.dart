@@ -13,7 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'view_routine.dart';
 
 class HomeBody extends StatefulWidget {
-  const HomeBody({super.key});
+  Function updatePage;
+  HomeBody(this.updatePage, {super.key});
   @override
   State<HomeBody> createState() => _HomeBodyState();
 }
@@ -45,12 +46,20 @@ class _HomeBodyState extends State<HomeBody> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   bool hasClicked = false;
 
+
+
   // Defining instance methods
   @override
   void initState() {
     super.initState();
     initPlatformState();
-    _loadUserData();
+
+    SharedPreferences.getInstance().then((sharedPrefs) {
+      setState(() {
+        prefs = sharedPrefs;
+        darkmode = prefs?.getBool('darkmode') ?? false;
+      });
+    });
   }
     void _loadUserData() async {
     prefs = await SharedPreferences.getInstance();
@@ -154,7 +163,7 @@ class _HomeBodyState extends State<HomeBody> {
 
     return Scaffold(
       key: scaffoldKey,
-      backgroundColor: AppStyles.primaryColor(darkmode).withOpacity(0.2),
+      backgroundColor: AppStyles.backgroundColor(darkmode),
       appBar: AppBar(
         title: Text("hello $firstName", style: AppStyles.getHeadingStyle(darkmode)),
         backgroundColor: AppStyles.primaryColor(darkmode),
@@ -168,93 +177,134 @@ class _HomeBodyState extends State<HomeBody> {
                     builder: ((context) => const NotifPage()),
                   ));
             },
-            child: Icon(currentNotifIcon),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              elevation: 0
+            ),
+            child: Icon(
+              currentNotifIcon,
+              color: AppStyles.textColor(darkmode),
+            ),
           )
         ],
       ),
-     body: Padding(
-  padding: const EdgeInsets.only(left: 10.0, right: 10.0, top: 25.0, bottom: 10.0),
-  child: Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      SizedBox( // Holds the pedometer step count
-        width: double.infinity,
-        height: 150.0,
+      body: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          if (details.delta.distance > 5) {
+            if (details.delta.dx < 0) {
+              widget.updatePage(2);
+            } else if (details.delta.dx > 0) {
+              widget.updatePage(0);
+            }
+          }
+        },
         child: Stack(
-          alignment: Alignment.center, // Ensure the circle is centered
           children: [
             Container(
-              width: 150.0,
-              height: 150.0,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(100.0),
-                border: Border.all(width: 2.0),
-                boxShadow:[
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 5,
-                  offset: Offset(0, 5),
-                ),
-              ],
-              ),
+              color: darkmode ? Colors.transparent : AppStyles.primaryColor(darkmode).withOpacity(0.2)
             ),
-                Text(
-                    "$_stepCount\nsteps",
-                    style: AppStyles.getSubHeadingStyle(darkmode),
-                    textAlign: TextAlign.center,
-                  ),
-            SizedBox(
-              height: 50.0,
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
+            Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0, top:25.0, bottom: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  routineData.isNotEmpty ? IconButton(
-                    onPressed: () async {
-                      setState(() {
-                        refresh = true;
-                      });
-                    },
-                    icon: Icon(Icons.refresh, color: AppStyles.textColor(darkmode), size: 24,),
-                  ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
+                  SizedBox( // holds the pedometer step count
+                    width: double.infinity,
+                    height: 150.0,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 150.0,
+                          height: 150.0,
+                          decoration: BoxDecoration(
+                            color: darkmode ? AppStyles.primaryColor(!darkmode).withOpacity(0.2) : AppStyles.backgroundColor(darkmode),
+                            borderRadius: BorderRadius.circular(100.0),
+                            border: Border.all(
+                              width: 8,
+                              color: AppStyles.secondaryColor(darkmode).withOpacity(0.25)
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: const Offset(0, 3),
+                                color: Colors.black.withOpacity(0.05)
+                              ),
+                              BoxShadow(
+                                blurRadius: 1,
+                                offset: const Offset(0, 1),
+                                color: Colors.black.withOpacity(0.1)
+                              )
+                            ]
+                          ),
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _stepCount,
+                              style: TextStyle(
+                                fontFamily: 'Geologica',
+                                fontSize: 28,
+                                fontWeight: FontWeight.w900,
+                                color: AppStyles.textColor(darkmode)
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              "steps",
+                              style: TextStyle(
+                                fontFamily: 'Geologica',
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500,
+                                color: AppStyles.textColor(darkmode).withOpacity(0.6)
+                              ),
+                              textAlign: TextAlign.center,
+                            )
+                          ],
+                        )
+                        
+                      ],
+                    ),
+                  ),
+            
+                  SizedBox(
+                    height: 50.0,
+                    width: double.infinity,
+                    child: Row(
+                      mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        routineData.isNotEmpty ? IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              refresh = true;
+                            });
+                          },
+                          icon: Icon(
+                            Icons.refresh,
+                            color: AppStyles.accentColor(darkmode),
+                            size: 24,
+                          ),
+                        ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
+                      ],
+                    )
+                  ),
+            
+                  Expanded( // holds this scrollable listview of routines
+                    child: ListView.separated(
+                      itemBuilder: (context, index) {
+                        return routineTile(routineNames[index], routineData.where((element) => element['routineName'] == routineNames[index]).toList());
+                      },
+                      separatorBuilder: (context, index) => const Divider(color: Colors.transparent),
+                      itemCount: routineNames.length,
+                    ),
+                  )
                 ],
-              )
-            ),
-          ],
-        ),
-      ),
-      SizedBox(
-        height: 50.0,
-        width: double.infinity,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  refresh = true;
-                });
-              },
-              icon: Icon(Icons.refresh, color: AppStyles.textColor(darkmode), size: 24),
-            ),
-          ],
-        ),
-      ),
-
-            Expanded( // holds this scrollable listview of routines
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return routineTile(routineNames[index], routineData.where((element) => element['routineName'] == routineNames[index]).toList());
-                },
-                separatorBuilder: (context, index) => const Divider(color: Colors.transparent),
-                itemCount: routineNames.length,
               ),
-            )
+            ),
           ],
         ),
       )
@@ -263,27 +313,49 @@ class _HomeBodyState extends State<HomeBody> {
 
   // method for generating a ListTile for the main widgets ListView
   Widget routineTile(String name, List<Map<String,dynamic>> exercises) {
-    return ListTile(
-      title: Text(
-        name, 
-        style: AppStyles.getSubHeadingStyle(darkmode),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(20)),
+        color: darkmode ? AppStyles.primaryColor(darkmode).withOpacity(0.2) : AppStyles.backgroundColor(darkmode),                  
+        boxShadow: [
+          BoxShadow(
+            spreadRadius: 1,
+            blurRadius: 3,
+            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.05)
+          ),
+          BoxShadow(
+            blurRadius: 1,
+            offset: const Offset(0, 1),
+            color: Colors.black.withOpacity(0.1)
+          )
+        ]
       ),
-      trailing: IconButton(
-        onPressed: () {
-          Navigator.push(
-            context, 
-            MaterialPageRoute(builder:(context) => RoutineView(name),)
-          );
-        },
-        icon: Icon(Icons.more_horiz, color: AppStyles.textColor(darkmode),),
+      child: ListTile(
+        title: Text(
+          name, 
+          style: AppStyles.getSubHeadingStyle(darkmode),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(builder:(context) => RoutineView(name),)
+            );
+          },
+          icon: Icon(
+            Icons.more_horiz,
+            color: AppStyles.accentColor(darkmode),
+          ),
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+          side: BorderSide.none
+        ),
+        contentPadding: const EdgeInsets.only(left: 20, right: 5),
       ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-        side: BorderSide.none
-      ),
-      tileColor: AppStyles.backgroundColor(darkmode),
     );
   } 
 }

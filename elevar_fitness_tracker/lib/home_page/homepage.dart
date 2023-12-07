@@ -24,46 +24,78 @@ class HomePage extends StatefulWidget {
 
 class HomePageState extends State<HomePage> {
   int currentIndex = 1; // the currently selected page (default is home page)
+  final PageController _pageController = PageController(initialPage: 1);
   late Map pages;
   bool darkmode = false;
+
+  void switchToPage(int index) {
+    setState(() {
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeOut
+      );
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    pages = {0:statsBody(), 1:HomeBody(), 2:AccountBody()}; // the mapping of our pages for the navbar
+    pages = {0:StatsBody(switchToPage), 1:HomeBody(switchToPage), 2:AccountBody(switchToPage)}; // the mapping of our pages for the navbar
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppStyles.backgroundColor(darkmode),
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppStyles.backgroundColor(darkmode),
+        unselectedLabelStyle: const TextStyle(
+          fontFamily: 'Geologica'
+        ),
+        selectedLabelStyle: TextStyle(
+          fontFamily: 'Geologica',
+          color: AppStyles.primaryColor(darkmode),
+          fontWeight: FontWeight.w700
+        ),
         currentIndex: currentIndex,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.graph_square, color: AppStyles.textColor(darkmode)),
+            icon: const Icon(CupertinoIcons.graph_square),
             activeIcon: Icon(CupertinoIcons.graph_square, color: AppStyles.primaryColor(darkmode)),
             label: "Stats"
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home, color: AppStyles.textColor(darkmode),),
+            icon: const Icon(CupertinoIcons.home),
             activeIcon: Icon(CupertinoIcons.home, color: AppStyles.primaryColor(darkmode)),
             label: "Home",
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.person_fill, color: AppStyles.textColor(darkmode)),
+            icon: const Icon(CupertinoIcons.person_fill),
             activeIcon: Icon(CupertinoIcons.person_fill, color: AppStyles.primaryColor(darkmode)),
             label: "Account",
           )
         ],
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppStyles.highlightColor(darkmode),
-        unselectedItemColor: AppStyles.textColor(darkmode),
+        selectedItemColor: AppStyles.textColor(darkmode),
+        unselectedItemColor: AppStyles.accentColor(darkmode),
+        unselectedIconTheme: IconThemeData(color: AppStyles.accentColor(darkmode)),
         onTap: (value) {
           setState(() {
             currentIndex = value;
+
+            _pageController.animateToPage(
+              value,
+              duration: const Duration(milliseconds: 100),
+              curve: Curves.easeOut
+            );
           });
         },
       ),
@@ -88,8 +120,21 @@ class HomePageState extends State<HomePage> {
         */
       ) : null,
 
-      body: pages[currentIndex], // this allows the body to change on setState() call
-      
+      //body: pages[currentIndex], // this allows the body to change on setState() call
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() => currentIndex = index);
+          },
+          children: [
+            pages[0],
+            pages[1],
+            pages[2]
+          ]
+        )
+      )
+
     );
   }
 }
