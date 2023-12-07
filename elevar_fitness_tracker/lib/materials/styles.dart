@@ -3,30 +3,30 @@ import 'package:flutter/material.dart';
 // class will contain various methods to make it easy to access styles throughout the project
 class AppStyles {
 
-  static TextStyle getHeadingStyle(bool darkmode) {
+  static TextStyle getHeadingStyle(bool darkmode, [Color? textColor]) {
     return TextStyle(
       fontFamily: 'Geologica',
-      fontSize: 24,
+   
       fontWeight: FontWeight.w800,
-      color: AppStyles.textColor(darkmode)
+      color: textColor ?? AppStyles.textColor(darkmode)
     );
   }
 
-  static TextStyle getSubHeadingStyle(bool darkmode) {
+  static TextStyle getSubHeadingStyle(bool darkmode, [Color? textColor]) {
     return TextStyle(
       fontFamily: 'Geologica',
-      fontSize: 18,
+
       fontWeight: FontWeight.w500,
-      color: AppStyles.textColor(darkmode)
+      color: textColor ?? AppStyles.textColor(darkmode)
     );
   }
 
-  static TextStyle getMainTextStyle(bool darkmode) {
+  static TextStyle getMainTextStyle(bool darkmode, [Color? textColor]) {
     return TextStyle(
       fontFamily: 'Geologica',
-      fontSize: 14,
+ 
       fontWeight: FontWeight.w400,
-      color: AppStyles.textColor(darkmode)
+      color: textColor ?? AppStyles.textColor(darkmode)
     );
   }
 

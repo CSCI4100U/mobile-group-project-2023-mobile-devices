@@ -8,9 +8,9 @@ class DBUtils {
     return openDatabase(path.join(myPath, 'routines_database.db'),
         onCreate: (db, version) async {
       await db.execute('''CREATE TABLE Routines(
-          routineName TEXT,
-          exerciseName TEXT,
-          muscle, TEXT,
+          routineName TEXT NOT NULL,
+          exerciseName TEXT NOT NULL,
+          muscle TEXT NOT NULL,
           heavySetReps INTEGER DEFAULT 0,
           weight FLOAT(6) DEFAULT 0)''');
     }, version: 1);

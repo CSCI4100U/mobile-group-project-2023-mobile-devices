@@ -17,7 +17,6 @@ class AddExerciseState extends State<AddExercise> {
   }
 
   final formkey = GlobalKey<FormState>();
-  final AppStyles styles = AppStyles();
   final HttpModel http = HttpModel();
   TextEditingController textControl = TextEditingController();
   bool refresh = true;
@@ -126,7 +125,7 @@ class AddExerciseState extends State<AddExercise> {
                 child: ElevatedButton(
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all<Color>(
-                        AppStyles.highlightColor(darkmode)),
+                        AppStyles.primaryColor(darkmode)),
                     elevation: MaterialStateProperty.all<double>(4.0),
                     side: MaterialStateProperty.all<BorderSide>(const BorderSide(color:Colors.black, width: 2.0))
                   ),

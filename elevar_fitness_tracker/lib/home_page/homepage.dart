@@ -23,7 +23,6 @@ class HomePage extends StatefulWidget {
 
 
 class HomePageState extends State<HomePage> {
-  AppStyles styles = AppStyles(); // initializing our styles object
   int currentIndex = 1; // the currently selected page (default is home page)
   late Map pages;
   bool darkmode = false;
