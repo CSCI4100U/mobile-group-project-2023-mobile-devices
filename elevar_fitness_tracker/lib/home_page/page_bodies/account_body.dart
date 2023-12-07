@@ -1,14 +1,19 @@
 /*
   This file returns the encapsulating body widget for the Account page
 */
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:elevar_fitness_tracker/components/account_page_entry.dart';
 import 'package:elevar_fitness_tracker/login_signup_page/login_signup_page.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:elevar_fitness_tracker/materials/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AccountBody extends StatefulWidget {
   Function updatePage;
@@ -47,6 +52,9 @@ class _AccountBodyState extends State<AccountBody> {
   SharedPreferences? prefs;
   String username = "";
   bool darkmode = false;
+
+  Uint8List? userImage;
+  File? selectedImage;
 
   @override
   void initState() {
@@ -294,6 +302,149 @@ class _AccountBodyState extends State<AccountBody> {
     setState(() {});
   }
 
+  //Dialog for users to pick image source
+  void pickProfilePic() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context);
+                pickImageFromAlbum();
+              },
+              child: const ListTile(
+                leading: Icon(Icons.photo_library),
+                title: Text('Photo Album'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context);
+                pickImageFromCamera();
+              },
+              child: const ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text('Camera'),
+              ),
+            ),
+            const Divider(),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(context);
+                FirebaseFirestore.instance.collection('users').doc(username).update({
+                  'picture_url': FieldValue.delete()
+                });
+                setState(() {});
+              },
+              child: const ListTile(
+                leading: Icon(Icons.delete),
+                title: Text('Remove'),
+              ),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  //Take picture using camera
+  Future<void> pickImageFromCamera() async {
+    try {
+      ImagePicker picker = ImagePicker();
+      final returnImage = await picker.pickImage(source: ImageSource.camera);
+
+      if (returnImage == null) {
+        return;
+      }
+
+      final File imageFile = File(returnImage.path);
+
+      if (imageFile.existsSync()) {
+        // Push image to firebase
+        DateTime now = DateTime.now().toLocal();
+        var filename = '${now.year}-${now.month}-${now.day}.${now.hour}-${now.minute}-${now.second}';
+        final storageRef = FirebaseStorage.instance.ref().child('files').child(username);
+        // Delete existing profile pictures if any
+        await storageRef.listAll().then((value) {
+          for (var element in value.items) {
+            FirebaseStorage.instance.ref(element.fullPath).delete();
+          }
+        });
+        final fileRef = storageRef.child('$filename.${imageFile.path.split('.').last}');
+        final TaskSnapshot snapshot = await fileRef.putFile(imageFile);
+        var downloadUrl = await snapshot.ref.getDownloadURL();
+        FirebaseFirestore.instance.collection('users').doc(username).update({
+          'picture_url': downloadUrl
+        });
+
+        setState(() {
+          selectedImage = imageFile;
+          userImage = imageFile.readAsBytesSync();
+        });
+
+        // Pop route only if it exists
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        print('Error: Image file does not exist.');
+      }
+    } on FileSystemException catch (e) {
+      print('Error picking image: $e');
+    } catch (e) {
+      print('Unexpected error: $e');
+    }
+  }
+
+  //Open album to pick a picture
+  Future<void> pickImageFromAlbum() async {
+    try {
+      ImagePicker picker = ImagePicker();
+      final returnImage = await picker.pickImage(source: ImageSource.gallery);
+
+      if (returnImage == null) {
+        return;
+      }
+      final File imageFile = File(returnImage.path);
+
+      if (imageFile.existsSync()) {
+        // Push image to firebase
+        DateTime now = DateTime.now().toLocal();
+        var filename = '${now.year}-${now.month}-${now.day}.${now.hour}-${now.minute}-${now.second}';
+        final storageRef = FirebaseStorage.instance.ref().child('files').child(username);
+        // Delete existing profile pictures if any
+        await storageRef.listAll().then((value) {
+          for (var element in value.items) {
+            FirebaseStorage.instance.ref(element.fullPath).delete();
+          }
+        });
+        final fileRef = storageRef.child('$filename.${imageFile.path.split('.').last}');
+        final TaskSnapshot snapshot = await fileRef.putFile(imageFile);
+        var downloadUrl = await snapshot.ref.getDownloadURL();
+        FirebaseFirestore.instance.collection('users').doc(username).update({
+          'picture_url': downloadUrl
+        });
+
+        setState(() {
+          selectedImage = imageFile;
+          userImage = imageFile.readAsBytesSync();
+        });
+
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        print('Error: Image file does not exist.');
+      }
+    } on FileSystemException catch (e) {
+      print('Error picking image: $e');
+    } catch (e) {
+      print('Unexpected error: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext buildContext) {
     CollectionReference users = FirebaseFirestore.instance.collection('users');
@@ -392,6 +543,10 @@ class _AccountBodyState extends State<AccountBody> {
         
                       if (snapshot.connectionState == ConnectionState.done) {
                         Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                        Reference? httpsRef;
+                        if (data.containsKey('picture_url')) {
+                          httpsRef = FirebaseStorage.instance.refFromURL(data['picture_url']);
+                        }
         
                         return SingleChildScrollView(
                           child: Column(
@@ -431,18 +586,104 @@ class _AccountBodyState extends State<AccountBody> {
                                       children: [
                                         Container(
                                           margin: AppStyles.getDefaultInsets(),
-                                          child: CircleAvatar(
-                                            backgroundColor: AppStyles.secondaryColor(isDarkMode),
-                                            minRadius: 60,
-                                            child: Text(
-                                              "${data['first_name'][0]}${data['last_name'][0]}",
-                                              style: TextStyle(
-                                                fontFamily: 'Geologica',
-                                                fontSize: 48,
-                                                fontWeight: FontWeight.w800,
-                                                color: AppStyles.textColor(isDarkMode).withOpacity(0.5),
+                                          child: httpsRef == null
+                                          ? Stack(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundColor: AppStyles.secondaryColor(isDarkMode),
+                                                minRadius: 60,
+                                                child: Text(
+                                                  "${data['first_name'][0]}${data['last_name'][0]}",
+                                                  style: TextStyle(
+                                                    fontFamily: 'Geologica',
+                                                    fontSize: 48,
+                                                    fontWeight: FontWeight.w800,
+                                                    color: AppStyles.textColor(isDarkMode).withOpacity(0.5),
+                                                  )
+                                                )
+                                              ),
+                                              Positioned(
+                                                bottom: 0,
+                                                right: -25,
+                                                child: RawMaterialButton(
+                                                  onPressed: () {
+                                                    pickProfilePic();
+                                                  },
+                                                  fillColor: AppStyles.primaryColor(isDarkMode),
+                                                  shape: const CircleBorder(),
+                                                  elevation: 4,
+                                                  child: Icon(
+                                                    Icons.camera_alt,
+                                                    color: AppStyles.textColor(!isDarkMode),
+                                                  )
+                                                )
                                               )
-                                            )
+                                            ],
+                                          )
+                                          : FutureBuilder(
+                                            future: httpsRef.getData(),
+                                            builder: (BuildContext imgContext, AsyncSnapshot<Uint8List?> imgSnapshot) {
+                                              if (imgSnapshot.connectionState == ConnectionState.done && imgSnapshot.hasData) {
+                                                return Stack(
+                                                  children: [
+                                                    CircleAvatar(
+                                                      minRadius: 60,
+                                                      backgroundImage: MemoryImage(imgSnapshot.data!),
+                                                    ),
+                                                    Positioned(
+                                                      bottom: 0,
+                                                      right: -25,
+                                                      child: RawMaterialButton(
+                                                        onPressed: () {
+                                                          pickProfilePic();
+                                                        },
+                                                        fillColor: AppStyles.primaryColor(isDarkMode),
+                                                        shape: const CircleBorder(),
+                                                        elevation: 4,
+                                                        child: Icon(
+                                                          Icons.camera_alt,
+                                                          color: AppStyles.textColor(!isDarkMode),
+                                                        )
+                                                      )
+                                                    )
+                                                  ],
+                                                );
+                                              }
+
+                                              return Stack(
+                                                children: [
+                                                  CircleAvatar(
+                                                    backgroundColor: AppStyles.secondaryColor(isDarkMode),
+                                                    minRadius: 60,
+                                                    child: Text(
+                                                      "${data['first_name'][0]}${data['last_name'][0]}",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Geologica',
+                                                        fontSize: 48,
+                                                        fontWeight: FontWeight.w800,
+                                                        color: AppStyles.textColor(isDarkMode).withOpacity(0.5),
+                                                      )
+                                                    )
+                                                  ),
+                                                  Positioned(
+                                                    bottom: 0,
+                                                    right: -25,
+                                                    child: RawMaterialButton(
+                                                      onPressed: () {
+                                                        pickProfilePic();
+                                                      },
+                                                      fillColor: AppStyles.primaryColor(isDarkMode),
+                                                      shape: const CircleBorder(),
+                                                      elevation: 4,
+                                                      child: Icon(
+                                                        Icons.camera_alt,
+                                                        color: AppStyles.textColor(!isDarkMode),
+                                                      )
+                                                    )
+                                                  )
+                                                ],
+                                              );
+                                            }
                                           )
                                         ),
                                         Expanded(
