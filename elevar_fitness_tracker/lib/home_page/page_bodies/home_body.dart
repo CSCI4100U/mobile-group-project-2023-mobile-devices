@@ -185,19 +185,22 @@ class _HomeBodyState extends State<HomeBody> {
                 mainAxisAlignment: routineData.isNotEmpty ? MainAxisAlignment.end : MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  routineData.isNotEmpty ? IconButton(
+                  IconButton(
                     onPressed: () async {
                       setState(() {
                         refresh = true;
                       });
                     },
                     icon: Icon(Icons.refresh, color: AppStyles.textColor(darkmode), size: 24,),
-                  ) : Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),),
+                  )
                 ],
               )
             ),
 
-            Expanded( // holds this scrollable listview of routines
+            routineData.isEmpty ? SizedBox(
+              height: 50.0,
+              child: Text("Try Adding A Workout!", style: AppStyles.getSubHeadingStyle(darkmode),)
+            ) : Expanded( // holds this scrollable listview of routines
               child: ListView.separated(
                 itemBuilder: (context, index) {
                   return routineTile(routineNames[index], routineData.where((element) => element['routineName'] == routineNames[index]).toList());
@@ -205,7 +208,7 @@ class _HomeBodyState extends State<HomeBody> {
                 separatorBuilder: (context, index) => const Divider(color: Colors.transparent),
                 itemCount: routineNames.length,
               ),
-            )
+            ),
           ],
         ),
       )
