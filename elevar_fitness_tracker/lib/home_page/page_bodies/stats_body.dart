@@ -48,7 +48,7 @@ class StatsBodyState extends State<StatsBody> {
                 ),
               ],
             ),
-        backgroundColor: AppStyles.primaryColor(darkmode),
+        backgroundColor: AppStyles.primaryColor(darkmode).withOpacity(darkmode ? 0.5 : 1.0),
       ),
       body: Stack(
         children: [

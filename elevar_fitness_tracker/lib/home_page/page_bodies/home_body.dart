@@ -153,7 +153,7 @@ class _HomeBodyState extends State<HomeBody> {
             Text("Home", style: AppStyles.getHeadingStyle(darkmode)),
           ],
         ),
-        backgroundColor: AppStyles.primaryColor(darkmode),
+        backgroundColor: AppStyles.primaryColor(darkmode).withOpacity(darkmode ? 0.5 : 1.0),
         actions: [
           ElevatedButton(
             onPressed: handleNotifButton,
